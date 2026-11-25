@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-uses="thermometer:base alert:badge" data-keyline="portrait" data-overflow="modifier badge">
+  <path d="M6 12V6A3 3 0 0 1 12 6V12A5 5 0 1 1 6 12Z"/>
+  <path d="M9 10V16"/>
+  <path d="M19 16V19" fill="none" stroke="currentColor" stroke-width="2"/>
+  <circle cx="19" cy="22" r="1" fill="currentColor" stroke="none"/>
+</svg>

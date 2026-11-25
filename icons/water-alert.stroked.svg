@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-uses="water:base alert:badge" data-keyline="portrait" data-overflow="modifier badge">
+  <path d="M9 4L13 12A5 5 0 1 1 5 12Z"/>
+  <path d="M19 16V19" fill="none" stroke="currentColor" stroke-width="2"/>
+  <circle cx="19" cy="22" r="1" fill="currentColor" stroke="none"/>
+</svg>
