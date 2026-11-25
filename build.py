@@ -586,6 +586,8 @@ def main():
             rules.add("hand-override")
         if name in drawn and hand_file(name, "filled") == hand_file(name, "stroked"):
             rules.add("strokes-only")
+        if name not in drawn:
+            rules.discard("motion")  # a derived icon carries its base's markers but the preview does not animate it
         if name in aliases.values():
             rules.add("alias")
         if uses(name, drawn):
