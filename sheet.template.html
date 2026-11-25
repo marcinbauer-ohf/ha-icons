@@ -31,6 +31,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 
 /* top bar */
 .bar{display:flex;align-items:center;gap:16px;padding:0 24px;height:52px;border-bottom:1px solid var(--line);position:relative;z-index:3}
+.bar>.seg:not(.nav){flex:none}
 .bar h1{white-space:nowrap}
 .logo{display:flex;margin-right:4px}
 .logo .house{fill:var(--ink)}
@@ -41,14 +42,6 @@ h1,h2,h3,p,dl,dd{margin:0}
 .seg.nav b{font-weight:500;font-size:11px;min-width:18px;padding:0 5px;border-radius:999px;background:var(--line);color:var(--muted);text-align:center}
 .seg.nav b:empty{display:none}
 .seg.nav #issuecount{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
-.pop{position:relative}
-.pop summary{list-style:none;cursor:pointer;user-select:none}
-.pop summary::-webkit-details-marker{display:none}
-.pop[open] summary{border-color:var(--ink)}
-.pop-panel{position:absolute;right:0;top:calc(100% + 8px);width:300px;padding:12px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 12px 32px -8px #0003;display:grid;gap:10px}
-.pop-panel .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0}
-.pop-panel .row>span{color:var(--muted)}
-.pop-panel p{color:var(--muted);font-size:12px;padding-top:10px;border-top:1px solid var(--line)}
 .bar h1{font-size:15px;font-weight:650;letter-spacing:-.01em}
 .bar .meta{color:var(--muted)}
 .bar .grow{flex:1}
@@ -70,6 +63,11 @@ h1,h2,h3,p,dl,dd{margin:0}
 .chip[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 .chip b{font-weight:500;opacity:.7;margin-left:4px}
 .hint{color:var(--muted);margin-top:32px}
+.catsel+.catsel{margin-left:0}
+.filters:has(+.filters){margin-bottom:8px}
+.filters.opts{gap:4px 16px}
+.opt{display:flex;align-items:center;gap:8px;color:var(--muted);white-space:nowrap}
+.opts .switch{margin-left:auto}
 .catsel{font:inherit;color:var(--ink);margin-left:auto;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);max-width:220px}
 .switch{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 8px;white-space:nowrap;color:var(--muted)}
 .switch[aria-checked=true]{color:var(--ink)}
@@ -205,6 +203,9 @@ dt{color:var(--muted)}
 .anim [data-anim=charge]{transform-origin:12px 7px;animation:charge 2.8s linear infinite}
 .anim [data-anim=charge-fill]{transform-origin:12px 18px;animation:chargefill 2.8s linear infinite}
 .anim [data-anim=spin]{animation:spin 1.6s linear infinite}
+@keyframes sway{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+.anim [data-anim=sway]{transform-origin:11px 13px;animation:sway 3.6s ease-in-out infinite}
+.anim [data-anim=brush]{transform-origin:17px 7px;animation:spin 2.4s linear infinite}
 .anim [data-anim=spin-slow]{animation:spin 14s linear infinite}
 .anim [data-anim=hand-m]{animation:spin 4s linear infinite}
 .anim [data-anim=hand-h]{animation:spin 48s linear infinite}
@@ -307,16 +308,7 @@ button.relchip:hover{border-color:var(--muted)}
   <nav class="seg nav" data-key="mode" aria-label="Views"><button data-v="browse">Browse</button><button data-v="compare">Compare<b id="pincount"></b></button><button data-v="dash">Dashboard</button><button data-v="motion">Motion</button><button data-v="issues">Issues<b id="issuecount"></b></button><button data-v="rules">Rules</button></nav>
   <input class="search" id="q" type="search" placeholder="Search icons" aria-label="Search icons">
   <div class="seg" data-key="variant" role="group" aria-label="Variant"><button data-v="filled">Filled</button><button data-v="stroked">Stroked</button></div>
-  <details class="pop">
-    <summary class="tool">View</summary>
-    <div class="pop-panel">
-      <div class="row"><span>Compare with</span><div class="seg" data-key="show" role="group" aria-label="Show MDI original"><button data-v="new">Nothing</button><button data-v="mdi">MDI</button></div></div>
-      <div class="row"><span>Icon size</span><div class="seg" data-key="size" role="group" aria-label="Icon size"><button data-v="20">20</button><button data-v="24">24</button><button data-v="32">32</button><button data-v="48">48</button></div></div>
-      <div class="row"><span>Theme</span><div class="seg" data-key="theme" role="group" aria-label="App theme"><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
-      <div class="row"><span>Grid order</span><div class="seg" data-key="group" role="group" aria-label="Grid order"><button data-v="family">Families</button><button data-v="az">A to Z</button></div></div>
-      <p id="meta"></p>
-    </div>
-  </details>
+  <div class="seg" data-key="theme" role="group" aria-label="App theme"><button data-v="light">Light</button><button data-v="dark">Dark</button></div>
 </header>
 
 <div class="work">
@@ -334,7 +326,7 @@ const moving = (n, v, px) => !ANIM[n] || v === 'mdi' ? use(n, v, px) :
   ANIM[n][v].replaceAll(`${n}-${v}-`, `${n}-${v}-${++uid}-`).replace('<svg ', `<svg class="anim" width="${px}" height="${px}" aria-hidden="true" `)
 const byName = Object.fromEntries(ICONS.map(i => [i.n, i]))
 const S = {sel: ICONS[0].n, mode: 'browse', variant: 'filled', show: 'new', size: '24', theme: 'light',
-  filter: 'all', q: '', uses: '', rule: '', cat: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
+  filter: 'all', q: '', uses: '', rule: '', cat: '', ha: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
 try { Object.assign(S, JSON.parse(localStorage.getItem('ha-icons-sheet') || '{}')) } catch {}
 if (!byName[S.sel]) S.sel = ICONS[0].n
 S.pins = S.pins.filter(n => byName[n])
@@ -345,12 +337,22 @@ const use = (n, v, px, cls = '') => v === 'mdi' && !byName[n].m ? '' :
   `<svg class="${cls}" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true"><use href="#${n}-${v}"/></svg>`
 const LABEL = {mdi: 'MDI', filled: 'Filled', stroked: 'Stroked'}
 const FILTERS = {all: () => true, drawn: i => i.d, derived: i => !i.d, animated: i => i.a, proposals: i => i.p, issues: i => i.e}
+const seg = (key, label, opts) => `<span class="opt">${label}<span class="seg" data-key="${key}" role="group" aria-label="${label}">${
+  opts.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join('')}</span></span>`
+const MDIOPT = seg('show', 'Compare with', [['new', 'Nothing'], ['mdi', 'MDI']])
 const NOCAT = 'Uncategorised'
 const catsOf = i => i.g ? (i.g.categories.length ? i.g.categories : [NOCAT]) : []
 const CATS = [...new Set(ICONS.flatMap(catsOf))].sort((a, b) => (a === NOCAT) - (b === NOCAT) || a.localeCompare(b))
 // search matches the name and Pictogrammers' aliases ("notifications" finds bell)
-const matches = (i, q) => !q || i.n.includes(q) || (i.g && i.g.aliases.some(a => a.includes(q)))
-const visible = () => ICONS.filter(i => FILTERS[S.filter](i) && matches(i, S.q.trim().toLowerCase()) && (!S.cat || catsOf(i).includes(S.cat)) &&
+// Home Assistant tags: every "domain", "domain.x" or "domain: state" string an icon carries
+const HAKEYS = {domain: 'Default icon for', device_class: 'Device class', state: 'State', action: 'Action', trigger: 'Trigger', condition: 'Condition', entity: 'Integration entities'}
+const haTags = i => Object.keys(HAKEYS).filter(k => k !== 'entity').flatMap(k => i.h[k] || [])
+const haDomain = t => t.split(/[.:]/)[0]
+const HADOMAINS = [...new Set(ICONS.flatMap(i => ['domain', 'device_class', 'state'].flatMap(k => i.h[k] || []).map(haDomain)))].sort()
+const inHa = (i, d) => haTags(i).some(t => haDomain(t) === d)
+// search matches the name, Pictogrammers' aliases ("notifications" finds bell) and Home Assistant tags ("vacuum.start" finds play)
+const matches = (i, q) => !q || i.n.includes(q) || (i.g && i.g.aliases.some(a => a.includes(q))) || haTags(i).some(t => t.includes(q))
+const visible = () => ICONS.filter(i => FILTERS[S.filter](i) && matches(i, S.q.trim().toLowerCase()) && (!S.cat || catsOf(i).includes(S.cat)) && (!S.ha || inHa(i, S.ha)) &&
   (!S.uses || i.u.some(u => u[0] === S.uses)) && (!S.rule || i.r.includes(S.rule)))
 const usedIn = n => ICONS.filter(i => i.u.some(u => u[0] === n))
 const ROLE = {base: 'base', badge: 'small badge', cutout: 'cut-out', part: 'part'}
@@ -389,10 +391,11 @@ function renderBrowse() {
   const x = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'
   const active = (S.uses ? `<button class="chip on" data-clearuses title="Clear this filter">Uses ${S.uses}${x}</button>` : '') +
     (S.rule ? `<button class="chip on" data-clearrule title="Clear this filter">Rule: ${RULE[S.rule]}${x}</button>` : '')
-  $('main').innerHTML = `<div class="filters">${chips}${active}<select class="catsel" id="cat" aria-label="Pictogrammers category"><option value="">All categories</option>${CATS.map(c =>
-      `<option value="${esc(c)}" ${c === S.cat ? 'selected' : ''}>${esc(c)} (${ICONS.filter(i => catsOf(i).includes(c)).length})</option>`).join('')}</select><button class="switch" data-animate role="switch" aria-checked="${S.animate}" title="Play the moving parts of every icon that has them"><i></i>Play motion</button></div>` +
-    (list.length ? body + `<p class="hint"><kbd>←</kbd> <kbd>→</kbd> step through icons · <kbd>P</kbd> pin to compare · shift-click also pins · <kbd>/</kbd> search</p>` :
-      `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}${S.rule ? ` and follows “${RULE[S.rule]}”` : ''}${S.cat ? ` in ${esc(S.cat)}` : ''}. Clear the search or pick another filter.</div>`)
+  $('main').innerHTML = `<div class="filters">${chips}${active}<select class="catsel" id="ha" aria-label="Home Assistant domain"><option value="">All HA domains</option>${HADOMAINS.map(d =>
+      `<option ${d === S.ha ? 'selected' : ''} value="${d}">${d} (${ICONS.filter(i => inHa(i, d)).length})</option>`).join('')}</select><select class="catsel" id="cat" aria-label="Pictogrammers category"><option value="">All categories</option>${CATS.map(c =>
+      `<option value="${esc(c)}" ${c === S.cat ? 'selected' : ''}>${esc(c)} (${ICONS.filter(i => catsOf(i).includes(c)).length})</option>`).join('')}</select></div><div class="filters opts">${seg('size', 'Size', [20, 24, 32, 48].map(n => [n, n]))}${seg('group', 'Order', [['family', 'Families'], ['az', 'A to Z']])}${MDIOPT}<button class="switch" data-animate role="switch" aria-checked="${S.animate}" title="Play the moving parts of every icon that has them"><i></i>Play motion</button></div>` +
+    (list.length ? body + `<p class="hint"><kbd>←</kbd> <kbd>→</kbd> step through icons · <kbd>P</kbd> pin to compare · shift-click also pins · <kbd>/</kbd> search<br>${ICONS.length} icons, ${ICONS.filter(i => i.d).length} hand-drawn. Corner radius ${RADIUS} px, set when the set is built.</p>` :
+      `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}${S.rule ? ` and follows “${RULE[S.rule]}”` : ''}${S.cat ? ` in ${esc(S.cat)}` : ''}${S.ha ? ` for the ${S.ha} domain` : ''}. Clear the search or pick another filter.</div>`)
 }
 
 function renderCompare() {
@@ -415,7 +418,7 @@ function renderInspector() {
   const chev = d => `<svg width="16" height="16" viewBox="0 0 24 24"><path d="${d}"/></svg>`
   const strip = cls => `<div class="strip ${cls}">${[16, 20, 24, 32, 48].map(px =>
     `<figure>${use(i.n, v, px)}<figcaption class="num">${px}</figcaption></figure>`).join('')}</div>`
-  const tile = cls => `<div class="tilebg ${cls}"><div class="tile"><i>${use(i.n, v, 32)}</i><span><b>${esc(pretty(i.n))}</b><small>On</small></span></div></div>`
+  const tile = cls => `<div class="tilebg ${cls}"><div class="tile"><i>${(S.animate ? moving : use)(i.n, v, 32)}</i><span><b>${esc(pretty(i.n))}</b><small>On</small></span></div></div>`
   $('ins').innerHTML = `
     <div class="ins-head">
       <div><h2>${i.n}</h2><p>${i.p ? 'Proposal, not in the set' : i.d ? 'Hand-drawn' : 'Derived from ' + i.b} · keyline ${i.k}</p></div>
@@ -426,7 +429,7 @@ function renderInspector() {
       </div>
     </div>
     <div class="seg nav tabs" data-key="tab" role="tablist"><button data-v="preview">Preview</button><button data-v="details">Details</button><button data-v="issues">Issues<b>${probs.length || ''}</b></button></div>
-    <div data-t="preview" class="stage big${dark}">${S.rules ? RULES : ''}${S.ghost && v !== 'mdi' ? use(i.n, 'mdi', 24, 'ghost') : ''}${use(i.n, v, 24)}</div>
+    <div data-t="preview" class="stage big${dark}">${S.rules ? RULES : ''}${S.ghost && v !== 'mdi' ? use(i.n, 'mdi', 24, 'ghost') : ''}${(S.animate ? moving : use)(i.n, v, 24)}</div>
     <div data-t="preview" class="stage-opts">
       <div class="seg" data-key="stage" role="group" aria-label="Preview background"><button data-v="light">Light</button><button data-v="dark">Dark</button></div>
       <label><input type="checkbox" data-toggle="rules" ${S.rules ? 'checked' : ''}>Pixel grid</label>
@@ -447,6 +450,11 @@ function renderInspector() {
       <button class="link" data-uses="${i.n}">Show these ${used.length} in the grid</button>` : '<p class="ok">No other icon reuses this one yet.</p>'}</section>
     <section data-t="details"><h3>Rules applied</h3><div class="rulelist">${i.r.map(id =>
       `<button data-rule="${id}" title="Show every icon that uses this rule"><span>${RULE[id]}</span><small class="num">${ruleCount(id)}</small></button>`).join('')}</div></section>
+    <section data-t="details"><h3>Home Assistant</h3>${Object.keys(i.h).length ? `<dl>${Object.keys(HAKEYS).filter(k => i.h[k]).map(k =>
+      `<dt>${HAKEYS[k]}</dt><dd>${esc(i.h[k].join(', '))}</dd>`).join('')}
+      ${i.h.integrations ? `<dt>Integrations</dt><dd class="num">${i.h.integrations}</dd>` : ''}
+      <dt>Frontend</dt><dd>${i.h.ui ? 'Used directly in the interface' : 'Not used directly'}</dd>
+    </dl>` : '<p class="ok">Home Assistant does not use this icon by default.</p>'}</section>
     <section data-t="details"><h3>Pictogrammers</h3>${i.g ? `<dl>
       <dt>Categories</dt><dd class="rel">${catsOf(i).map(c => `<button class="relchip" data-cat="${esc(c)}" title="Show every icon in this category">${esc(c)}</button>`).join('')}</dd>
       <dt>Aliases</dt><dd>${i.g.aliases.length ? esc(i.g.aliases.join(', ')) : 'None'}</dd>
@@ -498,7 +506,7 @@ function dashboard(v, label) {
   </div></div>`
 }
 function renderDash() {
-  $('main').innerHTML = `<div class="dashes">${dashboard(S.variant, LABEL[S.variant] + ' set')}${S.show === 'mdi' ? dashboard('mdi', 'Material Design Icons') : ''}</div>`
+  $('main').innerHTML = `<div class="filters opts">${MDIOPT}</div><div class="dashes">${dashboard(S.variant, LABEL[S.variant] + ' set')}${S.show === 'mdi' ? dashboard('mdi', 'Material Design Icons') : ''}</div>`
 }
 
 function renderMotion() {
@@ -558,7 +566,6 @@ function render(what = 'all') {
   document.documentElement.dataset.theme = S.theme
   $('pincount').textContent = S.pins.length || ''
   $('issuecount').textContent = problemIcons().length || ''
-  $('meta').textContent = `${ICONS.length} icons, ${ICONS.filter(i => i.d).length} hand-drawn. Corner radius ${RADIUS} px, set when the set is built.`
   if (what !== 'ins') ({compare: renderCompare, rules: renderRules, dash: renderDash, motion: renderMotion, issues: renderIssues}[S.mode] || renderBrowse)()
   renderInspector()
   sync()
@@ -605,13 +612,10 @@ document.addEventListener('click', e => {
   if (t.dataset.stagev) { S.stageV = t.dataset.stagev; return render('ins') }
   if (t.dataset.n) (e.shiftKey || e.altKey) ? togglePin(t.dataset.n) : select(t.dataset.n, true)
 })
-document.addEventListener('click', e => {  // the View menu closes when you click away from it
-  const pop = document.querySelector('.pop')
-  if (pop.open && !pop.contains(e.target)) pop.open = false
-})
 document.addEventListener('change', e => {
   if (e.target.dataset.toggle) { S[e.target.dataset.toggle] = e.target.checked; render('ins') }
   if (e.target.id === 'cat') { S.cat = e.target.value; render() }
+  if (e.target.id === 'ha') { S.ha = e.target.value; render() }
 })
 $('q').value = S.q
 $('q').addEventListener('input', e => { S.q = e.target.value; render() })

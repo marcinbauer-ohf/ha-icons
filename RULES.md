@@ -106,6 +106,11 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 
 - Every icon keeps its MDI name, and with it Pictogrammers' own record: categories, search aliases, author and the version it was added in. The build copies these from the MDI package into `dist/metadata.json`; they are never edited by hand. (build)
 
+## Home Assistant tags
+
+- Every icon records where Home Assistant uses it: the domains it is the default icon for, device classes, states, actions, triggers and conditions, how many integrations use it, and whether the frontend uses it directly. `ha_tags.py` reads this from Home Assistant core's `icons.json` files and the frontend source and writes `ha-tags.json`; the build copies it into `dist/metadata.json` under `home_assistant`. The tags are never edited by hand; rerun the script after a Home Assistant release. (build)
+- An `-outline` name that is an alias passes its tags to its base icon. (build)
+
 ## Outline names
 
 - An MDI `-outline` name is not an icon of its own. It is the stroked variant of its base and is listed in `dist/outline-aliases.json`. Draw it only when it means something different. (build)

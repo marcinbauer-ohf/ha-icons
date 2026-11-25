@@ -591,6 +591,7 @@ def main():
     proposed = {f.name.split(".")[0] for f in (ROOT / "proposals").glob("*.svg")}
     drawn = sorted({f.name.split(".")[0] for f in (ROOT / "icons").glob("*.svg")} | proposed)
     wanted = json.loads((ROOT / "ha-default-icons.json").read_text())
+    ha_tags = json.loads((ROOT / "ha-tags.json").read_text())  # written by ha_tags.py
     bases = {n[:-8] for n in wanted if n.endswith("-outline")}  # built so the outline name has something to alias
     names = [n for n in sorted(set(drawn) | set(wanted) | bases) if source(n, "filled") and source(n, "stroked")]
     names.sort(key=lambda n: (n not in ("circle", "square"), n))
@@ -664,7 +665,13 @@ def main():
         if up := upstream.get(name):
             metadata[name] = {"categories": up["tags"], "aliases": up["aliases"], "author": up["author"],
                               "version": up["version"], "codepoint": up["codepoint"], "deprecated": up["deprecated"]}
-        meta.append({"n": name, "g": metadata.get(name), "d": name in drawn, "b": name.rpartition("-")[0], "m": bool(mdi), "e": any(n.startswith("ERROR") for n in notes),
+        ha = {}  # where Home Assistant uses this icon; an aliased -outline name counts as the same icon
+        for src in (name, *(a for a, b in aliases.items() if b == name)):
+            for k, v in ha_tags.get(src, {}).items():
+                ha[k] = sorted(set(ha.get(k, [])) | set(v)) if isinstance(v, list) else max(ha.get(k, 0), v)
+        if ha:
+            metadata.setdefault(name, {})["home_assistant"] = ha
+        meta.append({"n": name, "h": ha, "g": metadata.get(name) if name in upstream else None, "d": name in drawn, "b": name.rpartition("-")[0], "m": bool(mdi), "e": any(n.startswith("ERROR") for n in notes),
                      "k": ET.fromstring(source(name, "filled")).get("data-keyline", "?"), "u": uses(name, drawn), "p": name in proposed,
                      "r": [r for r in RULE_LABELS if r in rules],
                      "s": [len(cells[0]), len(cells[1]), len(mdi)], "t": notes})
