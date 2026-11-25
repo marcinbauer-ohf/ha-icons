@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-motion="The shine slides along the edge of the bulb" data-keyline="portrait">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-motion="The shine grows along the edge of the bulb and back" data-keyline="portrait">
   <circle cx="12" cy="9" r="6"/>
-  <path d="M13 7L14 8" data-anim="shine"/>
+  <path d="M13 7L14 8" data-anim="still"/>
+  <path d="M12 6A3 3 0 0 1 15 9" pathLength="100" display="none" data-anim="shine"/>
   <path d="M9 18H15"/>
   <path d="M10 21H14"/>
 </svg>

@@ -93,6 +93,7 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 - Parts that move are marked in the authoring file with `data-anim`, and the root describes the movement in `data-motion`. The keyframes live in the preview template. (build)
 - Motion stops when the viewer has asked for reduced motion. (build)
 - The static icon must be complete on its own; motion never carries the meaning alone. (by eye)
+- A part marked `data-anim="still"` is the resting version of something that moves: it shows in the static icon and steps aside while the icon is animated (the bulb's short shine, replaced in motion by an arc that grows along the edge). (build)
 - A part that only exists while the icon moves (the charge level in `battery`) is marked `display="none"`, so the static icon and the built path never show it. (build)
 
 ## Waivers

@@ -190,14 +190,15 @@ dt{color:var(--muted)}
 @keyframes blink{0%,88%,100%{transform:scaleY(1)}94%{transform:scaleY(.1)}}
 @keyframes needle{0%,100%{transform:rotate(-40deg)}50%{transform:rotate(30deg)}}
 @keyframes unlock{0%,40%,100%{transform:none}50%,90%{transform:translateY(-1px) rotate(-18deg)}}
-@keyframes shine{0%,100%{transform:rotate(0)}50%{transform:rotate(-70deg)}}
+@keyframes shine{0%,100%{stroke-dasharray:22 200;stroke-dashoffset:-39}50%{stroke-dasharray:100 200;stroke-dashoffset:0}}
 @keyframes walk{0%,100%{transform:translateX(0)}50%{transform:translateX(2px)}}
 @keyframes swing{0%,35%,100%{transform:scaleX(1)}50%,85%{transform:scaleX(.55)}}
 @keyframes charge{0%{transform:scaleY(1)}80%,100%{transform:scaleY(0)}}
 @keyframes chargefill{0%{transform:scaleY(0)}80%,100%{transform:scaleY(1)}}
 .anim [data-anim=needle]{animation:needle 2.8s ease-in-out infinite}
 .anim [data-anim=unlock]{transform-origin:8px 10px;animation:unlock 3s cubic-bezier(.2,.8,.2,1) infinite}
-.anim [data-anim=shine]{transform-origin:12px 9px;animation:shine 3.2s ease-in-out infinite}
+.anim [data-anim=shine]{animation:shine 2.8s ease-in-out infinite}
+.anim [data-anim=still]{display:none}
 .anim [display=none]{display:inline}
 .anim [data-anim=walk]{animation:walk 1.8s ease-in-out infinite}
 .anim [data-anim=swing]{transform-origin:6px 12px;animation:swing 3.4s cubic-bezier(.3,0,.2,1) infinite}

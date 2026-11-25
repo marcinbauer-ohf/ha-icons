@@ -26,7 +26,7 @@ VARIANTS = ("filled", "stroked")
 SHAPES = {"rect", "circle", "line", "polyline", "polygon", "path"}
 ATTRS = {"viewBox", "fill", "stroke", "stroke-width", "stroke-linejoin", "stroke-linecap", "x", "y", "width",
          "height", "rx", "cx", "cy", "r", "x1", "y1", "x2", "y2", "points", "d", "id", "mask",
-         "data-keyline", "data-overflow", "data-exceptions", "data-r", "data-uses", "data-anim", "data-motion", "display"}
+         "data-keyline", "data-overflow", "data-exceptions", "data-r", "data-uses", "data-anim", "data-motion", "display", "pathLength"}
 NUM = r"-?\d*\.?\d+"
 # Corner radius. Authoring SVGs are drawn for radius 2; the build renders at --radius (default 4).
 # K scales every rounding: rect rx, polygon data-r, the stroke on filled masses, and line joins and caps.
@@ -232,6 +232,29 @@ def area(el, style, ids):
     return line_region(geom(el), sw) if sw else geom(el) if filled else Path()
 
 
+DRAWN_LINES = {"shine"}  # data-anim values whose line is animated by drawing more or less of it
+
+
+def animated_markup(el, style, in_mask=False):
+    """The icon as separate flattened parts, for the preview's animations: each shape goes through the same
+    rounding as the built icon (so it follows --radius), but stays its own <path> so it can still move."""
+    t = tag(el)
+    own = {**style, **{k: el.get(k) for k in ("fill", "stroke", "stroke-width") if el.get(k)}}
+    keep = "".join(f' {k}="{el.get(k)}"' for k in ("id", "mask", "data-anim", "display") if el.get(k))
+    if t in ("svg", "g", "mask"):
+        inner = "".join(animated_markup(c, own, in_mask or t == "mask") for c in el)
+        return inner if t == "svg" else f"<{t}{keep}>{inner}</{t}>"
+    if el.get("data-anim") in DRAWN_LINES:  # stays a real stroke so the preview can animate how much of it is drawn
+        return (f'<path d="{el.get("d")}" fill="none" stroke="{own.get("stroke") if in_mask else "currentColor"}" '
+                f'stroke-width="{own.get("stroke-width")}" stroke-linecap="round" pathLength="{el.get("pathLength")}"{keep}/>')
+    hidden = el.attrib.pop("display", None)  # area() skips motion-only parts; here they are wanted
+    d = to_d(area(el, style, {}))
+    if hidden:
+        el.set("display", hidden)
+    paint = own.get("fill") if own.get("fill") != "none" else own.get("stroke")
+    return f'<path d="{d}" fill="{paint if in_mask else "currentColor"}"{keep}/>'
+
+
 def contours(p):
     """[[('M'|'L'|'Q'|'C', points...)]], one list per contour."""
     # ponytail: arcs become many short quads (long path strings); emit A commands if file size matters
@@ -349,6 +372,9 @@ def lint_shape(p, overflow):
     fat.stroke(0.96, LineCap.ROUND_CAP, LineJoin.ROUND_JOIN, 4)
     if len(contours(op(p, fat, PathOp.UNION))) != len(contours(p)):
         errs.append("a gap or cut-out is under 1 px")
+    thin = op(p, stroked(p, 0.96), PathOp.DIFFERENCE)  # shave 0.48 px off every edge
+    if len(contours(thin)) != len(contours(p)):  # something split, vanished, or a cut-out broke through
+        errs.append("a wall or part is under 1 px wide")
     for hole, w, h, x, y in small_parts(p):
         errs.append(f"{'cut-out' if hole else 'fragment'} at ({x:.1f},{y:.1f}) is {w:.1f} x {h:.1f}, minimum is 2 x 2")
     return errs
@@ -643,9 +669,11 @@ def main():
                      "r": [r for r in RULE_LABELS if r in rules],
                      "s": [len(cells[0]), len(cells[1]), len(mdi)], "t": notes})
         if name in drawn and "data-anim" in source(name, "filled"):
-            # the preview animates the authoring SVG, because the flattened path has no separate parts to move
+            # the single built path has no separate parts to move, so the preview animates a per-part version
             meta[-1]["a"] = ET.fromstring(source(name, "filled")).get("data-motion", "")
-            anim[name] = {v: re.sub(r'(id="|url\(#)', rf"\g<1>{name}-{v}-", source(name, v)) for v in VARIANTS}
+            anim[name] = {v: re.sub(r'(id="|url\(#)', rf"\g<1>{name}-{v}-",
+                                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">'
+                                    + animated_markup(ET.fromstring(source(name, v)), {}) + "</svg>") for v in VARIANTS}
     for v in VARIANTS:
         (dist / f"{v}.json").write_text(json.dumps(out[v], indent=0))
     (dist / "outline-aliases.json").write_text(json.dumps(aliases, indent=0))

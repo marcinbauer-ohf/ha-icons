@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-motion="The shine slides along the edge of the bulb" data-keyline="portrait">
-  <mask id="c"><rect width="24" height="24" fill="#fff"/><path d="M14 6L15 7" fill="none" stroke="#000" stroke-width="2" data-anim="shine"/></mask>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-motion="The shine grows along the edge of the bulb and back" data-keyline="portrait">
+  <mask id="c"><rect width="24" height="24" fill="#fff"/><path d="M14 6L15 7" fill="none" stroke="#000" stroke-width="2" data-anim="still"/><path d="M12 5A4 4 0 0 1 16 9" fill="none" stroke="#000" stroke-width="2" pathLength="100" display="none" data-anim="shine"/></mask>
   <g mask="url(#c)">
     <circle cx="12" cy="9" r="7"/>
   </g>
