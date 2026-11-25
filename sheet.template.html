@@ -32,6 +32,9 @@ h1,h2,h3,p,dl,dd{margin:0}
 /* top bar */
 .bar{display:flex;align-items:center;gap:16px;padding:0 24px;height:52px;border-bottom:1px solid var(--line);position:relative;z-index:3}
 .bar h1{white-space:nowrap}
+.logo{display:flex;margin-right:4px}
+.logo .house{fill:var(--ink)}
+.logo .tree{fill:var(--bg)}
 .seg.nav{align-self:stretch;padding:0;background:none;border-radius:0;gap:4px;margin-right:auto;min-width:0;overflow-x:auto;scrollbar-width:none}
 .seg.nav button{padding:0 10px;border-radius:0;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px}
 .seg.nav button[aria-pressed=true]{background:none;box-shadow:none;color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
@@ -67,18 +70,21 @@ h1,h2,h3,p,dl,dd{margin:0}
 .chip[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 .chip b{font-weight:500;opacity:.7;margin-left:4px}
 .hint{color:var(--muted);margin-top:32px}
-.chip.play{margin-left:auto}
-.chip.play{border:1px solid var(--line)}
-.chip.play[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.catsel{font:inherit;color:var(--ink);margin-left:auto;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);max-width:220px}
+.switch{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 8px;white-space:nowrap;color:var(--muted)}
+.switch[aria-checked=true]{color:var(--ink)}
+.switch i{position:relative;width:32px;height:20px;border-radius:999px;background:var(--line);transition:background .15s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px #0003;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+.switch[aria-checked=true] i{background:var(--accent)}
+.switch[aria-checked=true] i::after{transform:translateX(12px)}
 kbd{font:inherit;padding:0 5px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
 
 .letter{margin-bottom:20px}
 .letter h3{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px 8px}
-.fams{display:flex;flex-wrap:wrap;gap:4px}
-.fam{display:flex;flex-wrap:wrap;border-radius:12px;max-width:100%}
-.fam.multi{background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
+.fams{display:flex;flex-wrap:wrap;gap:8px}
+.fam{display:flex;flex-wrap:wrap;border-radius:12px;max-width:100%;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
 .fam .cell{width:var(--cell,92px)}
-.fam.multi .cell:hover{background:var(--surface)}
+.fam .cell:hover{background:var(--surface)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cell,92px),1fr));gap:4px}
 .cell{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px 8px;border-radius:10px;
   transition:background .12s}
@@ -288,7 +294,10 @@ button.relchip:hover{border-color:var(--muted)}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">{{defs}}</svg>
 
 <header class="bar">
-  <h1>HA icon set</h1>
+  <h1 class="logo"><svg viewBox="0 0 240 240" width="28" height="28" role="img" aria-label="Home Assistant icons">
+    <path class="house" d="M240 224.762a15 15 0 0 1-15 15H15a15 15 0 0 1-15-15v-90c0-8.25 4.77-19.769 10.61-25.609l98.78-98.7805c5.83-5.83 15.38-5.83 21.21 0l98.79 98.7895c5.83 5.83 10.61 17.36 10.61 25.61v90-.01Z"/>
+    <path class="tree" d="m107.27 239.762-40.63-40.63c-2.09.72-4.32 1.13-6.64 1.13-11.3 0-20.5-9.2-20.5-20.5s9.2-20.5 20.5-20.5 20.5 9.2 20.5 20.5c0 2.33-.41 4.56-1.13 6.65l31.63 31.63v-115.88c-6.8-3.3395-11.5-10.3195-11.5-18.3895 0-11.3 9.2-20.5 20.5-20.5s20.5 9.2 20.5 20.5c0 8.07-4.7 15.05-11.5 18.3895v81.27l31.46-31.46c-.62-1.96-.96-4.04-.96-6.2 0-11.3 9.2-20.5 20.5-20.5s20.5 9.2 20.5 20.5-9.2 20.5-20.5 20.5c-2.5 0-4.88-.47-7.09-1.29L129 208.892v30.88z"/>
+  </svg></h1>
   <nav class="seg nav" data-key="mode" aria-label="Views"><button data-v="browse">Browse</button><button data-v="compare">Compare<b id="pincount"></b></button><button data-v="dash">Dashboard</button><button data-v="motion">Motion</button><button data-v="issues">Issues<b id="issuecount"></b></button><button data-v="rules">Rules</button></nav>
   <input class="search" id="q" type="search" placeholder="Search icons" aria-label="Search icons">
   <div class="seg" data-key="variant" role="group" aria-label="Variant"><button data-v="filled">Filled</button><button data-v="stroked">Stroked</button></div>
@@ -319,7 +328,7 @@ const moving = (n, v, px) => !ANIM[n] || v === 'mdi' ? use(n, v, px) :
   ANIM[n][v].replaceAll(`${n}-${v}-c`, `${n}-${v}-c${++uid}`).replace('<svg ', `<svg class="anim" width="${px}" height="${px}" aria-hidden="true" `)
 const byName = Object.fromEntries(ICONS.map(i => [i.n, i]))
 const S = {sel: ICONS[0].n, mode: 'browse', variant: 'filled', show: 'new', size: '24', theme: 'light',
-  filter: 'all', q: '', uses: '', rule: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
+  filter: 'all', q: '', uses: '', rule: '', cat: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
 try { Object.assign(S, JSON.parse(localStorage.getItem('ha-icons-sheet') || '{}')) } catch {}
 if (!byName[S.sel]) S.sel = ICONS[0].n
 S.pins = S.pins.filter(n => byName[n])
@@ -330,7 +339,12 @@ const use = (n, v, px, cls = '') => v === 'mdi' && !byName[n].m ? '' :
   `<svg class="${cls}" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true"><use href="#${n}-${v}"/></svg>`
 const LABEL = {mdi: 'MDI', filled: 'Filled', stroked: 'Stroked'}
 const FILTERS = {all: () => true, drawn: i => i.d, derived: i => !i.d, animated: i => i.a, proposals: i => i.p, issues: i => i.e}
-const visible = () => ICONS.filter(i => FILTERS[S.filter](i) && i.n.includes(S.q.trim().toLowerCase()) &&
+const NOCAT = 'Uncategorised'
+const catsOf = i => i.g ? (i.g.categories.length ? i.g.categories : [NOCAT]) : []
+const CATS = [...new Set(ICONS.flatMap(catsOf))].sort((a, b) => (a === NOCAT) - (b === NOCAT) || a.localeCompare(b))
+// search matches the name and Pictogrammers' aliases ("notifications" finds bell)
+const matches = (i, q) => !q || i.n.includes(q) || (i.g && i.g.aliases.some(a => a.includes(q)))
+const visible = () => ICONS.filter(i => FILTERS[S.filter](i) && matches(i, S.q.trim().toLowerCase()) && (!S.cat || catsOf(i).includes(S.cat)) &&
   (!S.uses || i.u.some(u => u[0] === S.uses)) && (!S.rule || i.r.includes(S.rule)))
 const usedIn = n => ICONS.filter(i => i.u.some(u => u[0] === n))
 const ROLE = {base: 'base', badge: 'small badge', cutout: 'cut-out', part: 'part'}
@@ -363,15 +377,16 @@ function renderBrowse() {
       ;(fams.get(i.f) || fams.set(i.f, []).get(i.f)).push(i)
     }
     body = [...letters].map(([letter, fams]) => `<section class="letter"><h3>${letter}</h3><div class="fams">${
-      [...fams.values()].map(m => `<div class="fam${m.length > 1 ? ' multi' : ''}">${m.map(cell).join('')}</div>`).join('')}</div></section>`).join('')
+      [...fams.values()].map(m => `<div class="fam">${m.map(cell).join('')}</div>`).join('')}</div></section>`).join('')
   }
   $('main').style.setProperty('--cell', Math.max(92, (S.show === 'mdi' ? 2 * px + 10 : px) + 56) + 'px')
   const x = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'
   const active = (S.uses ? `<button class="chip on" data-clearuses title="Clear this filter">Uses ${S.uses}${x}</button>` : '') +
     (S.rule ? `<button class="chip on" data-clearrule title="Clear this filter">Rule: ${RULE[S.rule]}${x}</button>` : '')
-  $('main').innerHTML = `<div class="filters">${chips}${active}<button class="chip play" data-animate aria-pressed="${S.animate}" title="Play the moving parts of every icon that has them">${S.animate ? 'Stop motion' : 'Play motion'}</button></div>` +
+  $('main').innerHTML = `<div class="filters">${chips}${active}<select class="catsel" id="cat" aria-label="Pictogrammers category"><option value="">All categories</option>${CATS.map(c =>
+      `<option value="${esc(c)}" ${c === S.cat ? 'selected' : ''}>${esc(c)} (${ICONS.filter(i => catsOf(i).includes(c)).length})</option>`).join('')}</select><button class="switch" data-animate role="switch" aria-checked="${S.animate}" title="Play the moving parts of every icon that has them"><i></i>Play motion</button></div>` +
     (list.length ? body + `<p class="hint"><kbd>←</kbd> <kbd>→</kbd> step through icons · <kbd>P</kbd> pin to compare · shift-click also pins · <kbd>/</kbd> search</p>` :
-      `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}${S.rule ? ` and follows “${RULE[S.rule]}”` : ''}. Clear the search or pick another filter.</div>`)
+      `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}${S.rule ? ` and follows “${RULE[S.rule]}”` : ''}${S.cat ? ` in ${esc(S.cat)}` : ''}. Clear the search or pick another filter.</div>`)
 }
 
 function renderCompare() {
@@ -426,6 +441,13 @@ function renderInspector() {
       <button class="link" data-uses="${i.n}">Show these ${used.length} in the grid</button>` : '<p class="ok">No other icon reuses this one yet.</p>'}</section>
     <section data-t="details"><h3>Rules applied</h3><div class="rulelist">${i.r.map(id =>
       `<button data-rule="${id}" title="Show every icon that uses this rule"><span>${RULE[id]}</span><small class="num">${ruleCount(id)}</small></button>`).join('')}</div></section>
+    <section data-t="details"><h3>Pictogrammers</h3>${i.g ? `<dl>
+      <dt>Categories</dt><dd class="rel">${catsOf(i).map(c => `<button class="relchip" data-cat="${esc(c)}" title="Show every icon in this category">${esc(c)}</button>`).join('')}</dd>
+      <dt>Aliases</dt><dd>${i.g.aliases.length ? esc(i.g.aliases.join(', ')) : 'None'}</dd>
+      <dt>Author</dt><dd>${esc(i.g.author)}</dd>
+      <dt>Added in</dt><dd class="num">MDI ${esc(i.g.version)}</dd>
+      <dt>Codepoint</dt><dd class="num">${esc(i.g.codepoint)}${i.g.deprecated ? ' · deprecated' : ''}</dd>
+    </dl>` : `<p class="ok">${i.p ? 'A proposal has no Pictogrammers record.' : 'This name is not in the Pictogrammers library.'}</p>`}</section>
     <section data-t="details"><h3>Properties</h3><dl>
       <dt>Source</dt><dd>${i.d ? `icons/${i.n}.filled.svg, .stroked.svg` : `${i.b} + “${i.n.slice(i.b.length + 1)}” modifier`}</dd>
       <dt>Keyline</dt><dd>${i.k}</dd>
@@ -563,6 +585,7 @@ document.addEventListener('click', e => {
   if ('clearuses' in t.dataset) { S.uses = ''; return render() }
   if (t.dataset.rule) { Object.assign(S, {rule: t.dataset.rule, uses: '', mode: 'browse', filter: 'all', q: ''}); $('q').value = ''; return render() }
   if ('clearrule' in t.dataset) { S.rule = ''; return render() }
+  if (t.dataset.cat) { Object.assign(S, {cat: t.dataset.cat, uses: '', rule: '', mode: 'browse', filter: 'all', q: ''}); $('q').value = ''; return render() }
   if ('animate' in t.dataset) { S.animate = !S.animate; return render() }
   if (t.dataset.unpin) return togglePin(t.dataset.unpin)
   if ('pause' in t.dataset) { t.setAttribute('aria-pressed', document.body.classList.toggle('paused')); return }
@@ -577,6 +600,7 @@ document.addEventListener('click', e => {  // the View menu closes when you clic
 })
 document.addEventListener('change', e => {
   if (e.target.dataset.toggle) { S[e.target.dataset.toggle] = e.target.checked; render('ins') }
+  if (e.target.id === 'cat') { S.cat = e.target.value; render() }
 })
 $('q').value = S.q
 $('q').addEventListener('input', e => { S.q = e.target.value; render() })

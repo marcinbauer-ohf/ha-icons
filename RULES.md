@@ -94,6 +94,10 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 - The static icon must be complete on its own; motion never carries the meaning alone. (by eye)
 - A part that only exists while the icon moves (the charge level in `battery`) is marked `display="none"`, so the static icon and the built path never show it. (build)
 
+## Pictogrammers metadata
+
+- Every icon keeps its MDI name, and with it Pictogrammers' own record: categories, search aliases, author and the version it was added in. The build copies these from the MDI package into `dist/metadata.json`; they are never edited by hand. (build)
+
 ## Outline names
 
 - An MDI `-outline` name is not an icon of its own. It is the stroked variant of its base and is listed in `dist/outline-aliases.json`. Draw it only when it means something different. (build)

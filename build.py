@@ -9,6 +9,7 @@ Run: uv run build.py [--radius 4]
   proposals/                          alternative drawings under review: previewed, never shipped
   dist/svg/                           authoring SVG for every built name (incl. composed)
   dist/<variant>.json                 {name: single path d}
+  dist/metadata.json                  Pictogrammers categories, aliases, author and version for each name
   dist/relations.json                 {name: {uses: [{icon, role}], used_in: [names]}}
   dist/outline-aliases.json           {mdi -outline name: base name whose stroked variant replaces it}
   dist/sheet.html                     contact sheet for visual review
@@ -548,6 +549,10 @@ def main():
     dist = ROOT / "dist"
     (dist / "svg").mkdir(parents=True, exist_ok=True)
     out, defs, meta, anim, failed = {v: {} for v in VARIANTS}, [], [], {}, 0
+    # Pictogrammers' own record for each MDI name: categories ("tags"), search aliases, author, version added
+    mdi_meta = ROOT / "vendor" / "mdi" / "meta.json"
+    upstream = {i["name"]: i for i in json.loads(mdi_meta.read_text())} if mdi_meta.exists() else {}
+    metadata = {}
     for name in names:
         cells, notes, rules = [], [], set()
         for v in VARIANTS:
@@ -597,7 +602,10 @@ def main():
         # each path is written once as a <symbol>; the sheet's script reuses it at every size
         defs.append("".join(f'<symbol id="{name}-{k}" viewBox="0 0 24 24"><path d="{d}"/></symbol>'
                             for k, d in (("filled", cells[0]), ("stroked", cells[1]), ("mdi", mdi)) if d))
-        meta.append({"n": name, "d": name in drawn, "b": name.rpartition("-")[0], "m": bool(mdi), "e": any(n.startswith("ERROR") for n in notes),
+        if up := upstream.get(name):
+            metadata[name] = {"categories": up["tags"], "aliases": up["aliases"], "author": up["author"],
+                              "version": up["version"], "codepoint": up["codepoint"], "deprecated": up["deprecated"]}
+        meta.append({"n": name, "g": metadata.get(name), "d": name in drawn, "b": name.rpartition("-")[0], "m": bool(mdi), "e": any(n.startswith("ERROR") for n in notes),
                      "k": ET.fromstring(source(name, "filled")).get("data-keyline", "?"), "u": uses(name, drawn), "p": name in proposed,
                      "r": [r for r in RULE_LABELS if r in rules],
                      "s": [len(cells[0]), len(cells[1]), len(mdi)], "t": notes})
@@ -608,6 +616,7 @@ def main():
     for v in VARIANTS:
         (dist / f"{v}.json").write_text(json.dumps(out[v], indent=0))
     (dist / "outline-aliases.json").write_text(json.dumps(aliases, indent=0))
+    (dist / "metadata.json").write_text(json.dumps(metadata, indent=1))
     relations = {m["n"]: {"rules": m["r"], "uses": [{"icon": n, "role": r} for n, r in m["u"]],
                           "used_in": [o["n"] for o in meta if any(n == m["n"] for n, _ in o["u"])]} for m in meta}
     (dist / "relations.json").write_text(json.dumps(relations, indent=1))
