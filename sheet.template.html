@@ -23,18 +23,33 @@ body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.4 system-ui,-app
   scrollbar-color:var(--line) transparent}
 ::selection{background:var(--accent);color:#fff}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-svg{display:block;fill:currentColor}
+svg{display:block}svg:not(.anim){fill:currentColor}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;padding:0}
 h1,h2,h3,p,dl,dd{margin:0}
 .num{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px}
 
 /* top bar */
-.bar{display:flex;align-items:center;gap:16px;padding:12px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bar{display:flex;align-items:center;gap:16px;padding:0 24px;height:52px;border-bottom:1px solid var(--line);position:relative;z-index:3}
+.bar h1{white-space:nowrap}
+.seg.nav{align-self:stretch;padding:0;background:none;border-radius:0;gap:4px;margin-right:auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+.seg.nav button{padding:0 10px;border-radius:0;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px}
+.seg.nav button[aria-pressed=true]{background:none;box-shadow:none;color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+.seg.nav b{font-weight:500;font-size:11px;min-width:18px;padding:0 5px;border-radius:999px;background:var(--line);color:var(--muted);text-align:center}
+.seg.nav b:empty{display:none}
+.seg.nav #issuecount{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
+.pop{position:relative}
+.pop summary{list-style:none;cursor:pointer;user-select:none}
+.pop summary::-webkit-details-marker{display:none}
+.pop[open] summary{border-color:var(--ink)}
+.pop-panel{position:absolute;right:0;top:calc(100% + 8px);width:300px;padding:12px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 12px 32px -8px #0003;display:grid;gap:10px}
+.pop-panel .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0}
+.pop-panel .row>span{color:var(--muted)}
+.pop-panel p{color:var(--muted);font-size:12px;padding-top:10px;border-top:1px solid var(--line)}
 .bar h1{font-size:15px;font-weight:650;letter-spacing:-.01em}
 .bar .meta{color:var(--muted)}
 .bar .grow{flex:1}
-.search{width:220px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);caret-color:var(--accent)}
+.search{width:200px;min-width:110px;flex-shrink:1;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);caret-color:var(--accent)}
 .search::placeholder{color:var(--muted)}
 .seg{display:flex;padding:2px;border-radius:8px;background:var(--line)}
 .seg button{padding:4px 10px;border-radius:6px;color:var(--muted);transition:background .15s,color .15s}
@@ -45,14 +60,25 @@ h1,h2,h3,p,dl,dd{margin:0}
 /* workbench */
 .work{display:grid;grid-template-columns:minmax(0,1fr) 440px;min-height:0}
 .main{overflow:auto;padding:16px 24px 48px}
-.filters{display:flex;gap:4px;align-items:center;margin-bottom:16px}
-.chip{padding:4px 10px;border-radius:999px;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:16px}
+.hint{white-space:nowrap}
+.chip{padding:4px 10px;border-radius:999px;color:var(--muted);white-space:nowrap}
 .chip:hover{color:var(--ink)}
 .chip[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 .chip b{font-weight:500;opacity:.7;margin-left:4px}
-.hint{margin-left:auto;color:var(--muted)}
+.hint{color:var(--muted);margin-top:32px}
+.chip.play{margin-left:auto}
+.chip.play{border:1px solid var(--line)}
+.chip.play[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
 kbd{font:inherit;padding:0 5px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
 
+.letter{margin-bottom:20px}
+.letter h3{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);margin:0 0 6px 8px}
+.fams{display:flex;flex-wrap:wrap;gap:4px}
+.fam{display:flex;flex-wrap:wrap;border-radius:12px;max-width:100%}
+.fam.multi{background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
+.fam .cell{width:var(--cell,92px)}
+.fam.multi .cell:hover{background:var(--surface)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cell,92px),1fr));gap:4px}
 .cell{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px 8px;border-radius:10px;
   transition:background .12s}
@@ -115,7 +141,11 @@ kbd{font:inherit;padding:0 5px;border:1px solid var(--line);border-radius:4px;ba
 .trio .stage svg{width:56px;height:56px}
 .trio .none{font-size:11px;opacity:.6}
 
+.ins[data-tab=preview] [data-t]:not([data-t=preview]),.ins[data-tab=details] [data-t]:not([data-t=details]),.ins[data-tab=issues] [data-t]:not([data-t=issues]){display:none}
+.tabs{height:36px;margin:0 0 20px;border-bottom:1px solid var(--line)}
+.tabs b:not(:empty){background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
 .ins section{margin-top:32px}
+.ins .tabs+section,.ins[data-tab=details] section[data-t=details]:first-of-type,.ins[data-tab=issues] section[data-t=issues]:first-of-type{margin-top:0}
 .ins h3{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
 .strips{display:grid;gap:8px}
 .strip{display:flex;align-items:flex-end;justify-content:space-around;padding:20px 16px 12px;border-radius:14px;
@@ -141,12 +171,99 @@ dt{color:var(--muted)}
 .notes li.err{color:var(--danger)}
 .ok{color:var(--muted)}
 
+/* motion: only parts move, the body of the icon is always there (RULES.md, Motion) */
+.anim [data-anim]{transform-box:view-box;transform-origin:12px 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ring{0%,45%,100%{transform:rotate(0)}6%{transform:rotate(14deg)}16%{transform:rotate(-12deg)}26%{transform:rotate(8deg)}35%{transform:rotate(-4deg)}}
+@keyframes clap{0%,45%,100%{transform:translateX(0)}6%{transform:translateX(-3px)}16%{transform:translateX(3px)}26%{transform:translateX(-2px)}35%{transform:translateX(1px)}}
+@keyframes wave1{0%{opacity:.25}20%,100%{opacity:1}}
+@keyframes wave2{0%{opacity:.25}40%,100%{opacity:1}}
+@keyframes wave3{0%{opacity:.25}60%,100%{opacity:1}}
+@keyframes drop{0%,100%{transform:translateY(-2px)}55%{transform:translateY(0)}}
+@keyframes toggle{0%,42%{transform:translateX(0)}50%,92%{transform:translateX(-8px)}100%{transform:translateX(0)}}
+@keyframes blink{0%,88%,100%{transform:scaleY(1)}94%{transform:scaleY(.1)}}
+@keyframes needle{0%,100%{transform:rotate(-40deg)}50%{transform:rotate(30deg)}}
+@keyframes unlock{0%,40%,100%{transform:translateY(0)}50%,90%{transform:translateY(-2px)}}
+@keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(.9)}}
+@keyframes swing{0%,35%,100%{transform:scaleX(1)}50%,85%{transform:scaleX(.55)}}
+@keyframes charge{0%{transform:scaleY(1)}80%,100%{transform:scaleY(0)}}
+@keyframes chargefill{0%{transform:scaleY(0)}80%,100%{transform:scaleY(1)}}
+.anim [data-anim=needle]{animation:needle 2.8s ease-in-out infinite}
+.anim [data-anim=unlock]{animation:unlock 3s cubic-bezier(.2,.8,.2,1) infinite}
+.anim [data-anim=glow]{transform-origin:12px 9px;animation:glow 2s ease-in-out infinite}
+.anim [data-anim=swing]{transform-origin:6px 12px;animation:swing 3.4s cubic-bezier(.3,0,.2,1) infinite}
+.anim [data-anim=charge]{display:inline;transform-origin:12px 7px;animation:charge 2.8s linear infinite}
+.anim [data-anim=charge-fill]{display:inline;transform-origin:12px 18px;animation:chargefill 2.8s linear infinite}
+.anim [data-anim=spin]{animation:spin 1.6s linear infinite}
+.anim [data-anim=spin-slow]{animation:spin 14s linear infinite}
+.anim [data-anim=hand-m]{animation:spin 4s linear infinite}
+.anim [data-anim=hand-h]{animation:spin 48s linear infinite}
+.anim [data-anim=ring]{transform-origin:12px 3px;animation:ring 2.6s ease-in-out infinite}
+.anim [data-anim=clapper]{animation:clap 2.6s ease-in-out infinite}
+.anim [data-anim=wave-1]{animation:wave1 2s step-end infinite}
+.anim [data-anim=wave-2]{animation:wave2 2s step-end infinite}
+.anim [data-anim=wave-3]{animation:wave3 2s step-end infinite}
+.anim [data-anim=drop]{animation:drop 1.3s cubic-bezier(.3,0,.2,1) infinite}
+.anim [data-anim=toggle]{animation:toggle 3.2s cubic-bezier(.2,.8,.2,1) infinite}
+.anim [data-anim=blink]{animation:blink 3.4s ease-in-out infinite}
+body.paused .anim [data-anim]{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.anim [data-anim]{animation:none}}
+.motion-head{display:flex;align-items:center;gap:16px;margin-bottom:24px;max-width:72ch}
+.motion-head p{color:var(--muted);flex:1}
+.motions{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px 16px}
+.motions button{display:flex;flex-direction:column;gap:12px;text-align:left;border-radius:20px;padding:4px 4px 12px}
+.motions button[aria-current=true]{box-shadow:0 0 0 2px var(--accent)}
+.motions .stage{aspect-ratio:1.5;border-radius:16px}
+.motions .stage svg{width:96px;height:96px}
+.motions .real{display:flex;gap:4px}
+.motions .real .stage{flex:1;aspect-ratio:auto;height:48px;border-radius:10px}
+.motions .real svg{width:24px;height:24px}
+.motions b{font-weight:600;padding:0 8px}
+.motions small{color:var(--muted);padding:0 8px;font-size:12px;line-height:1.4}
+/* dashboard: a mock Home Assistant overview, drawn with the set */
+.dashes{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}
+.dash{--card:#fff;--page:#eef0f3;--txt:#1c1c1e;--sub:#6a6d75;--idle:#e9ebef;--idle-ink:#5b5f68;
+  background:var(--page);color:var(--txt);border-radius:28px;padding:24px;container-type:inline-size}
+:root[data-theme=dark] .dash{--card:#1d1e21;--page:#0c0c0d;--txt:#ececee;--sub:#a0a3ab;--idle:#2a2c30;--idle-ink:#b4b7bf}
+.dash-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px}
+.dash-top h2{font-size:28px;font-weight:650;letter-spacing:-.02em}
+.dash-top span{color:var(--sub)}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
+.badge{display:flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border-radius:999px;background:var(--card);font-weight:550}
+.badge svg{color:var(--c,var(--idle-ink))}
+.dash-sections{display:grid;grid-template-columns:1fr;gap:28px 24px}
+@container (min-width:640px){.dash-sections{grid-template-columns:1fr 1fr}}
+@container (min-width:980px){.dash-sections{grid-template-columns:1fr 1fr 1fr}}
+.dash h3{font-size:15px;font-weight:650;margin-bottom:12px;color:var(--txt)}
+.dtiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dtile{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;gap:0 12px;padding:8px;border-radius:20px;background:var(--card);
+  text-align:left;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+.dtile:hover{transform:translateY(-1px)}
+.dtile[aria-current=true]{box-shadow:0 0 0 2px var(--accent)}
+.dtile i{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--idle);color:var(--idle-ink)}
+.dtile.on i{background:color-mix(in srgb,var(--c) 20%,transparent);color:var(--c)}
+.dtile b{display:block;font-size:14px;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtile small{display:block;font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtile .lvl{grid-column:1/-1;height:6px;border-radius:3px;margin:8px 4px 2px;background:var(--idle);overflow:hidden}
+.dtile .lvl::before{content:"";display:block;height:100%;width:var(--v);border-radius:3px;background:var(--c)}
+.dash-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .rel{display:flex;flex-wrap:wrap;gap:6px}
 .relchip{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
 button.relchip:hover{border-color:var(--muted)}
 .relchip small{color:var(--muted)}
 .relchip.missing{border-style:dashed;color:var(--muted)}
 .rel+.link{margin-top:12px}
+.issues h2{display:flex;align-items:center;gap:10px;margin:32px 0 4px}
+.issues h2 small{color:var(--muted);font-weight:500}
+.issues .sev{font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.issues .sev.err{border-color:var(--danger);color:var(--danger)}
+.issues .rel{margin-top:12px}
+.relchip[aria-current=true]{box-shadow:0 0 0 2px var(--accent);border-color:transparent}
+.rulelist{display:grid;gap:2px}
+.rulelist.wide{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px 24px}
+.rulelist button{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:7px 10px;margin:0 -10px;border-radius:8px;text-align:left}
+.rulelist button:hover{background:var(--surface)}
+.rulelist small{color:var(--muted)}
 .link{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 .chip.on{background:var(--accent);color:#fff;display:flex;align-items:center;gap:6px}
 .doc{max-width:72ch;font-size:14px;line-height:1.55;padding-bottom:48px}
@@ -172,14 +289,19 @@ button.relchip:hover{border-color:var(--muted)}
 
 <header class="bar">
   <h1>HA icon set</h1>
-  <span class="meta" id="meta"></span>
-  <span class="grow"></span>
+  <nav class="seg nav" data-key="mode" aria-label="Views"><button data-v="browse">Browse</button><button data-v="compare">Compare<b id="pincount"></b></button><button data-v="dash">Dashboard</button><button data-v="motion">Motion</button><button data-v="issues">Issues<b id="issuecount"></b></button><button data-v="rules">Rules</button></nav>
   <input class="search" id="q" type="search" placeholder="Search icons" aria-label="Search icons">
-  <div class="seg" data-key="mode" role="group" aria-label="View"><button data-v="browse">Browse</button><button data-v="compare">Compare <span id="pincount"></span></button><button data-v="rules">Rules</button></div>
   <div class="seg" data-key="variant" role="group" aria-label="Variant"><button data-v="filled">Filled</button><button data-v="stroked">Stroked</button></div>
-  <div class="seg" data-key="show" role="group" aria-label="Show MDI original"><button data-v="new">New only</button><button data-v="mdi">Next to MDI</button></div>
-  <div class="seg" data-key="size" role="group" aria-label="Icon size"><button data-v="20">20</button><button data-v="24">24</button><button data-v="32">32</button><button data-v="48">48</button></div>
-  <div class="seg" data-key="theme" role="group" aria-label="App theme"><button data-v="light">Light</button><button data-v="dark">Dark</button></div>
+  <details class="pop">
+    <summary class="tool">View</summary>
+    <div class="pop-panel">
+      <div class="row"><span>Compare with</span><div class="seg" data-key="show" role="group" aria-label="Show MDI original"><button data-v="new">Nothing</button><button data-v="mdi">MDI</button></div></div>
+      <div class="row"><span>Icon size</span><div class="seg" data-key="size" role="group" aria-label="Icon size"><button data-v="20">20</button><button data-v="24">24</button><button data-v="32">32</button><button data-v="48">48</button></div></div>
+      <div class="row"><span>Theme</span><div class="seg" data-key="theme" role="group" aria-label="App theme"><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
+      <div class="row"><span>Grid order</span><div class="seg" data-key="group" role="group" aria-label="Grid order"><button data-v="family">Families</button><button data-v="az">A to Z</button></div></div>
+      <p id="meta"></p>
+    </div>
+  </details>
 </header>
 
 <div class="work">
@@ -189,10 +311,15 @@ button.relchip:hover{border-color:var(--muted)}
 
 <template id="rules">{{rules}}</template>
 <script>
-const ICONS = {{data}}, RADIUS = "{{radius}}"
+const ICONS = {{data}}, RADIUS = "{{radius}}", ANIM = {{anim}}, RULE = {{rulelabels}}
+const ruleCount = id => ICONS.filter(i => i.r.includes(id)).length
+let uid = 0
+// the authoring SVG, inlined so its parts can move; mask ids are made unique per copy
+const moving = (n, v, px) => !ANIM[n] || v === 'mdi' ? use(n, v, px) :
+  ANIM[n][v].replaceAll(`${n}-${v}-c`, `${n}-${v}-c${++uid}`).replace('<svg ', `<svg class="anim" width="${px}" height="${px}" aria-hidden="true" `)
 const byName = Object.fromEntries(ICONS.map(i => [i.n, i]))
 const S = {sel: ICONS[0].n, mode: 'browse', variant: 'filled', show: 'new', size: '24', theme: 'light',
-  filter: 'all', q: '', uses: '', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
+  filter: 'all', q: '', uses: '', rule: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
 try { Object.assign(S, JSON.parse(localStorage.getItem('ha-icons-sheet') || '{}')) } catch {}
 if (!byName[S.sel]) S.sel = ICONS[0].n
 S.pins = S.pins.filter(n => byName[n])
@@ -202,28 +329,49 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&g
 const use = (n, v, px, cls = '') => v === 'mdi' && !byName[n].m ? '' :
   `<svg class="${cls}" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true"><use href="#${n}-${v}"/></svg>`
 const LABEL = {mdi: 'MDI', filled: 'Filled', stroked: 'Stroked'}
-const FILTERS = {all: () => true, drawn: i => i.d, derived: i => !i.d, issues: i => i.e}
+const FILTERS = {all: () => true, drawn: i => i.d, derived: i => !i.d, animated: i => i.a, proposals: i => i.p, issues: i => i.e}
 const visible = () => ICONS.filter(i => FILTERS[S.filter](i) && i.n.includes(S.q.trim().toLowerCase()) &&
-  (!S.uses || i.u.some(u => u[0] === S.uses)))
+  (!S.uses || i.u.some(u => u[0] === S.uses)) && (!S.rule || i.r.includes(S.rule)))
 const usedIn = n => ICONS.filter(i => i.u.some(u => u[0] === n))
 const ROLE = {base: 'base', badge: 'small badge', cutout: 'cut-out', part: 'part'}
 const pretty = n => n.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase())
 const RULES = `<svg class="rules" viewBox="0 0 24 24" aria-hidden="true"><path d="${
   [...Array(25).keys()].map(i => `M${i} 0V24M0 ${i}H24`).join('')}"/><rect class="live" x="2" y="2" width="20" height="20"/></svg>`
 
+// family = the base icon an icon is built on, followed up the chain (bell-alert and bell-off belong to bell)
+const famOf = i => { const b = i.u.find(u => u[1] === 'base' && byName[u[0]]); return b && b[0] !== i.n ? famOf(byName[b[0]]) : i.n }
+ICONS.forEach(i => { i.f = famOf(i) })
+// the icons to show, in the order they are drawn: grouped by family, or plain A to Z
+function ordered() {
+  const list = visible().sort((a, b) => a.n.localeCompare(b.n))
+  return S.group === 'az' ? list : list.sort((a, b) => a.f.localeCompare(b.f) || (b.n === b.f) - (a.n === a.f) || a.n.localeCompare(b.n))
+}
 function renderBrowse() {
-  const list = visible(), px = +S.size
+  const list = ordered(), px = +S.size
   const chips = Object.keys(FILTERS).map(k =>
     `<button class="chip" data-filter="${k}" aria-pressed="${S.filter === k}">${pretty(k)}<b>${ICONS.filter(FILTERS[k]).length}</b></button>`).join('')
-  const cells = list.map(i => `<button class="cell" data-n="${i.n}" aria-current="${i.n === S.sel}" title="${i.n}">
+  const cell = i => `<button class="cell" data-n="${i.n}" aria-current="${i.n === S.sel}" title="${i.n}">
     ${i.e ? '<i class="flag err"></i>' : ''}${S.pins.includes(i.n) ? '<i class="flag pin"></i>' : ''}
-    <span class="pair">${S.show === 'mdi' ? use(i.n, 'mdi', px, 'old') : ''}${use(i.n, S.variant, px)}</span>
-    <span class="nm">${i.n}</span></button>`).join('')
+    <span class="pair">${S.show === 'mdi' ? use(i.n, 'mdi', px, 'old') : ''}${S.animate ? moving(i.n, S.variant, px) : use(i.n, S.variant, px)}</span>
+    <span class="nm">${i.n}</span></button>`
+  let body
+  if (S.group === 'az') body = `<div class="grid">${list.map(cell).join('')}</div>`
+  else {
+    const letters = new Map()
+    for (const i of list) {
+      const fams = letters.get(i.f[0]) || letters.set(i.f[0], new Map()).get(i.f[0])
+      ;(fams.get(i.f) || fams.set(i.f, []).get(i.f)).push(i)
+    }
+    body = [...letters].map(([letter, fams]) => `<section class="letter"><h3>${letter}</h3><div class="fams">${
+      [...fams.values()].map(m => `<div class="fam${m.length > 1 ? ' multi' : ''}">${m.map(cell).join('')}</div>`).join('')}</div></section>`).join('')
+  }
   $('main').style.setProperty('--cell', Math.max(92, (S.show === 'mdi' ? 2 * px + 10 : px) + 56) + 'px')
-  const usesChip = S.uses ? `<button class="chip on" data-clearuses title="Clear this filter">Uses ${S.uses}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg></button>` : ''
-  $('main').innerHTML = `<div class="filters">${chips}${usesChip}<span class="hint"><kbd>←</kbd> <kbd>→</kbd> browse · <kbd>P</kbd> pin to compare · <kbd>/</kbd> search</span></div>` +
-    (list.length ? `<div class="grid">${cells}</div>` :
-      `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}. Clear the search or pick another filter.</div>`)
+  const x = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'
+  const active = (S.uses ? `<button class="chip on" data-clearuses title="Clear this filter">Uses ${S.uses}${x}</button>` : '') +
+    (S.rule ? `<button class="chip on" data-clearrule title="Clear this filter">Rule: ${RULE[S.rule]}${x}</button>` : '')
+  $('main').innerHTML = `<div class="filters">${chips}${active}<button class="chip play" data-animate aria-pressed="${S.animate}" title="Play the moving parts of every icon that has them">${S.animate ? 'Stop motion' : 'Play motion'}</button></div>` +
+    (list.length ? body + `<p class="hint"><kbd>←</kbd> <kbd>→</kbd> step through icons · <kbd>P</kbd> pin to compare · shift-click also pins · <kbd>/</kbd> search</p>` :
+      `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}${S.rule ? ` and follows “${RULE[S.rule]}”` : ''}. Clear the search or pick another filter.</div>`)
 }
 
 function renderCompare() {
@@ -242,70 +390,156 @@ function renderCompare() {
 function renderInspector() {
   const i = byName[S.sel], v = S.stageV === 'mdi' && !i.m ? 'filled' : S.stageV
   const dark = S.stage === 'dark' ? ' dark' : '', pinned = S.pins.includes(i.n), used = usedIn(i.n)
+  const probs = i.t.filter(isProblem), notes = i.t.filter(t => !isProblem(t))
   const chev = d => `<svg width="16" height="16" viewBox="0 0 24 24"><path d="${d}"/></svg>`
   const strip = cls => `<div class="strip ${cls}">${[16, 20, 24, 32, 48].map(px =>
     `<figure>${use(i.n, v, px)}<figcaption class="num">${px}</figcaption></figure>`).join('')}</div>`
   const tile = cls => `<div class="tilebg ${cls}"><div class="tile"><i>${use(i.n, v, 32)}</i><span><b>${esc(pretty(i.n))}</b><small>On</small></span></div></div>`
   $('ins').innerHTML = `
     <div class="ins-head">
-      <div><h2>${i.n}</h2><p>${i.d ? 'Hand-drawn' : 'Derived from ' + i.b} · keyline ${i.k}</p></div>
+      <div><h2>${i.n}</h2><p>${i.p ? 'Proposal, not in the set' : i.d ? 'Hand-drawn' : 'Derived from ' + i.b} · keyline ${i.k}</p></div>
       <div class="tools">
         <button class="tool" data-step="-1" aria-label="Previous icon">${chev('M15 6L9 12L15 18')}</button>
         <button class="tool" data-step="1" aria-label="Next icon">${chev('M9 6L15 12L9 18')}</button>
         <button class="tool" data-pin aria-pressed="${pinned}">${pinned ? 'Pinned' : 'Pin'}</button>
       </div>
     </div>
-    <div class="stage big${dark}">${S.rules ? RULES : ''}${S.ghost && v !== 'mdi' ? use(i.n, 'mdi', 24, 'ghost') : ''}${use(i.n, v, 24)}</div>
-    <div class="stage-opts">
+    <div class="seg nav tabs" data-key="tab" role="tablist"><button data-v="preview">Preview</button><button data-v="details">Details</button><button data-v="issues">Issues<b>${probs.length || ''}</b></button></div>
+    <div data-t="preview" class="stage big${dark}">${S.rules ? RULES : ''}${S.ghost && v !== 'mdi' ? use(i.n, 'mdi', 24, 'ghost') : ''}${use(i.n, v, 24)}</div>
+    <div data-t="preview" class="stage-opts">
       <div class="seg" data-key="stage" role="group" aria-label="Preview background"><button data-v="light">Light</button><button data-v="dark">Dark</button></div>
       <label><input type="checkbox" data-toggle="rules" ${S.rules ? 'checked' : ''}>Pixel grid</label>
       <label><input type="checkbox" data-toggle="ghost" ${S.ghost ? 'checked' : ''} ${i.m ? '' : 'disabled'}>MDI overlay</label>
     </div>
-    <div class="trio">${['mdi', 'filled', 'stroked'].map(k => `<button data-stagev="${k}" aria-pressed="${k === v}" ${k === 'mdi' && !i.m ? 'disabled' : ''}>
+    <div data-t="preview" class="trio">${['mdi', 'filled', 'stroked'].map(k => `<button data-stagev="${k}" aria-pressed="${k === v}" ${k === 'mdi' && !i.m ? 'disabled' : ''}>
       <span class="stage${dark}">${use(i.n, k, 56) || '<span class="none">Not in MDI</span>'}</span>${LABEL[k]}</button>`).join('')}</div>
-    <section><h3>Real size · ${LABEL[v]}</h3><div class="strips">${strip('')}${strip('dark')}</div></section>
-    <section><h3>In a tile card</h3><div class="tiles">${tile('')}${tile('dark')}</div></section>
-    <section><h3>Built from</h3>${i.u.length ? `<div class="rel">${i.u.map(([n, r]) => byName[n]
+    <section data-t="preview"><h3>Real size · ${LABEL[v]}</h3><div class="strips">${strip('')}${strip('dark')}</div></section>
+    <section data-t="preview"><h3>In a tile card</h3><div class="tiles">${tile('')}${tile('dark')}</div></section>
+    ${i.a ? `<section data-t="preview"><h3>Motion</h3><div class="strips"><div class="strip${dark}"><figure>${moving(i.n, v === 'mdi' ? 'filled' : v, 64)}</figure></div></div>
+      <p class="ok" style="margin-top:8px">${esc(i.a)}.</p></section>` : ''}
+    <section data-t="details"><h3>Built from</h3>${i.u.length ? `<div class="rel">${i.u.map(([n, r]) => byName[n]
         ? `<button class="relchip" data-n="${n}">${use(n, v === 'mdi' ? 'filled' : v, 20)}<span>${n}</span><small>${ROLE[r] || r}</small></button>`
         : `<span class="relchip missing"><span>${n}</span><small>${ROLE[r] || r} · not a standalone icon in the set</small></span>`).join('')}</div>`
       : '<p class="ok">Nothing. This icon stands on its own.</p>'}</section>
-    <section><h3>Used in ${used.length || 'no'} other icon${used.length === 1 ? '' : 's'}</h3>${used.length ? `<div class="rel">${used.map(o =>
+    <section data-t="details"><h3>Used in ${used.length || 'no'} other icon${used.length === 1 ? '' : 's'}</h3>${used.length ? `<div class="rel">${used.map(o =>
         `<button class="relchip" data-n="${o.n}">${use(o.n, v === 'mdi' ? 'filled' : v, 20)}<span>${o.n}</span><small>${ROLE[o.u.find(u => u[0] === i.n)[1]]}</small></button>`).join('')}</div>
       <button class="link" data-uses="${i.n}">Show these ${used.length} in the grid</button>` : '<p class="ok">No other icon reuses this one yet.</p>'}</section>
-    <section><h3>Properties</h3><dl>
+    <section data-t="details"><h3>Rules applied</h3><div class="rulelist">${i.r.map(id =>
+      `<button data-rule="${id}" title="Show every icon that uses this rule"><span>${RULE[id]}</span><small class="num">${ruleCount(id)}</small></button>`).join('')}</div></section>
+    <section data-t="details"><h3>Properties</h3><dl>
       <dt>Source</dt><dd>${i.d ? `icons/${i.n}.filled.svg, .stroked.svg` : `${i.b} + “${i.n.slice(i.b.length + 1)}” modifier`}</dd>
       <dt>Keyline</dt><dd>${i.k}</dd>
       <dt>Corner radius</dt><dd>${RADIUS} px</dd>
       <dt>Path size</dt><dd class="num">filled ${i.s[0]} · stroked ${i.s[1]}${i.m ? ` · MDI ${i.s[2]}` : ''} bytes</dd>
     </dl></section>
-    <section><h3>Lint</h3>${i.t.length ? `<ul class="notes">${i.t.map(t => `<li class="${t.startsWith('ERROR') ? 'err' : ''}">${esc(t)}</li>`).join('')}</ul>`
-      : '<p class="ok">No issues in either variant.</p>'}</section>`
+    <section data-t="issues"><h3>Problems</h3>${probs.length ? `<ul class="notes">${probs.map(t => `<li class="${t.startsWith('ERROR') ? 'err' : ''}">${esc(t)}</li>`).join('')}</ul>`
+      : '<p class="ok">None in either variant.</p>'}</section>
+    ${notes.length ? `<section data-t="issues"><h3>Notes</h3><ul class="notes">${notes.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : ''}`
+  $('ins').dataset.tab = S.tab
+}
+
+// [icon, name, state, tone, level%] - tone decides the colour; no tone means idle
+const TONE = {light: '#f5a524', heat: '#f76b15', cool: '#2b9af9', media: '#8e5cf7', cover: '#12a594', ok: '#2f9e44', warn: '#e5484d', power: '#e9a100'}
+const DASH = {
+  badges: [['lightbulb', '3 lights on', 'light'], ['thermometer', '21.5 °C', 'heat'], ['lock', 'Locked', 'ok'], ['motion-sensor', 'Motion in hallway', 'warn'], ['flash', '1.4 kW', 'power']],
+  sections: [
+    ['Favourites', [['lightbulb', 'Living room lights', 'On · 80%', 'light', 80], ['thermostat', 'Thermostat', 'Heating · 21.5 °C', 'heat'],
+      ['lock', 'Front door', 'Locked', 'ok'], ['shield-check', 'Alarm', 'Armed home', 'ok']]],
+    ['Living room', [['lightbulb', 'Ceiling', 'On · 80%', 'light', 80], ['lightbulb', 'Floor lamp', 'Off'], ['television', 'TV', 'Playing', 'media'],
+      ['speaker', 'Speaker', 'Idle'], ['blinds', 'Blinds', 'Open · 60%', 'cover', 60], ['motion-sensor', 'Motion', 'Clear']]],
+    ['Kitchen', [['lightbulb', 'Worktop', 'On · 45%', 'light', 45], ['power-socket', 'Coffee machine', 'On · 1.2 kW', 'power'], ['thermometer', 'Temperature', '22.1 °C'],
+      ['water', 'Humidity', '48%'], ['fan', 'Extractor', 'Off'], ['window-closed', 'Window', 'Closed']]],
+    ['Bedroom', [['lightbulb', 'Bedside', 'Off'], ['fan', 'Ceiling fan', 'On · Low', 'cool'], ['blinds', 'Blinds', 'Closed'],
+      ['thermometer', 'Temperature', '19.4 °C'], ['door', 'Door', 'Closed'], ['robot-vacuum', 'Vacuum', 'Docked']]],
+    ['Security', [['lock', 'Front door', 'Locked', 'ok'], ['lock-open', 'Garage', 'Unlocked', 'warn'], ['cctv', 'Driveway', 'Recording', 'media'],
+      ['motion-sensor', 'Hallway', 'Detected', 'warn'], ['door', 'Back door', 'Open', 'warn'], ['bell', 'Doorbell', 'Idle']]],
+    ['Energy and system', [['flash', 'Power now', '1.4 kW', 'power'], ['battery', 'Home battery', '76%', 'ok', 76], ['white-balance-sunny', 'Solar', '3.1 kW', 'light'],
+      ['wifi', 'Network', 'Online', 'ok'], ['harddisk', 'Storage', '62% used'], ['download', 'Updates', '2 available', 'cool']]],
+  ],
+}
+function dashboard(v, label) {
+  const tile = ([n, name, state, tone, lvl]) => !byName[n] ? '' :
+    `<button class="dtile${tone ? ' on' : ''}" data-n="${n}" aria-current="${n === S.sel}" style="--c:${TONE[tone] || ''}${lvl ? `;--v:${lvl}%` : ''}" title="${n}">
+      <i>${tone ? moving(n, v, 32) : use(n, v, 32)}</i><span><b>${name}</b><small>${state}</small></span>${lvl ? '<span class="lvl"></span>' : ''}</button>`
+  return `<div><p class="dash-label">${label}</p><div class="dash">
+    <div class="dash-top"><h2>Home</h2><span>Wednesday, 25 November</span></div>
+    <div class="badges">${DASH.badges.filter(b => byName[b[0]]).map(([n, text, tone]) =>
+      `<span class="badge" style="--c:${TONE[tone]}">${use(n, v, 20)}${text}</span>`).join('')}</div>
+    <div class="dash-sections">${DASH.sections.map(([title, tiles]) =>
+      `<section><h3>${title}</h3><div class="dtiles">${tiles.map(tile).join('')}</div></section>`).join('')}</div>
+  </div></div>`
+}
+function renderDash() {
+  $('main').innerHTML = `<div class="dashes">${dashboard(S.variant, LABEL[S.variant] + ' set')}${S.show === 'mdi' ? dashboard('mdi', 'Material Design Icons') : ''}</div>`
+}
+
+function renderMotion() {
+  const v = S.variant, list = ICONS.filter(i => i.a)
+  $('main').innerHTML = `<div class="motion-head"><p>${list.length} icons with moving parts. The body of each icon stays put; only the part that explains what the thing does moves.</p>
+      <button class="tool" data-pause aria-pressed="${document.body.classList.contains('paused')}">Pause</button></div>
+    <div class="motions">${list.map(i => `<button data-n="${i.n}" aria-current="${i.n === S.sel}">
+      <span class="stage${S.stage === 'dark' ? ' dark' : ''}">${moving(i.n, v, 96)}</span>
+      <span class="real"><span class="stage">${moving(i.n, v, 24)}</span><span class="stage dark">${moving(i.n, v, 24)}</span></span>
+      <b>${i.n}</b><small>${esc(i.a)}</small></button>`).join('')}</div>`
+}
+
+// what counts as a problem to fix, in the order the worklist shows it; everything else in the lint notes is a note
+const KINDS = [
+  [/^ERROR \w+: a gap or cut-out is under 1 px/, 'err', 'Gap or cut-out under 1 px', 'Two parts, or the two sides of a cut-out, sit closer than 1 px. Fails the build.'],
+  [/^ERROR \w+: (cut-out|fragment) at/, 'err', 'Cut-out or fragment under 2 x 2 px', 'Too small to render cleanly at 24 px. Fails the build.'],
+  [/^ERROR \w+: paint/, 'err', 'Paint outside the live area', 'Reaches past the padding without an overflow note. Fails the build.'],
+  [/^ERROR/, 'err', 'Other lint errors', 'Fails the build.'],
+  [/only nicks the base/, 'warn', 'Badge cut only nicks the base', 'The cut takes a sliver of the icon. Needs a hand-drawn version.'],
+  [/cut-out was filled in/, 'warn', 'Cut-out lost to a badge', 'Less than half of a cut-out would survive next to the badge, so it was filled in. Check the icon still reads.'],
+  [/sharp outer corner/, 'warn', 'Sharp outer corner', 'A convex corner on the silhouette is not rounded.'],
+]
+const kindOf = t => KINDS.findIndex(k => k[0].test(t))
+const isProblem = t => kindOf(t) >= 0
+const problemIcons = () => ICONS.filter(i => i.t.some(isProblem))
+function renderIssues() {
+  const groups = KINDS.map(() => new Map())
+  for (const i of ICONS) for (const t of i.t) {
+    const k = kindOf(t)
+    if (k >= 0) (groups[k].get(i.n) || groups[k].set(i.n, new Set()).get(i.n)).add(/filled/.test(t.split(':')[0]) ? 'filled' : 'stroked')
+  }
+  const total = problemIcons().length
+  $('main').innerHTML = !total ? `<div class="empty"><strong>Nothing to fix.</strong>Every icon passes lint in both variants and no badge cut is flagged.</div>` :
+    `<div class="doc issues"><p>${total} icon${total === 1 ? '' : 's'} need attention. Errors fail the build; warnings are icons the build could not derive cleanly.</p>${
+      KINDS.map(([, sev, title, why], k) => !groups[k].size ? '' : `<section><h2><span class="sev ${sev}">${sev === 'err' ? 'Error' : 'Warning'}</span>${title}<small class="num">${groups[k].size}</small></h2><p>${why}</p>
+        <div class="rel">${[...groups[k]].map(([n, vs]) => `<button class="relchip" data-n="${n}" aria-current="${n === S.sel}">${use(n, vs.has(S.variant) ? S.variant : [...vs][0], 20)}<span>${n}</span><small>${[...vs].join(' + ')}</small></button>`).join('')}</div></section>`).join('')}</div>`
 }
 
 function renderRules() {
-  $('main').innerHTML = `<article class="doc">${$('rules').innerHTML}</article>`
+  const used = Object.keys(RULE).filter(ruleCount)
+  $('main').innerHTML = `<article class="doc"><h2 style="margin-top:0">Rules in use</h2>
+    <p>What the build can see each icon doing. Pick one to list the icons that use it.</p>
+    <div class="rulelist wide">${used.map(id => `<button data-rule="${id}"><span>${RULE[id]}</span><small class="num">${ruleCount(id)}</small></button>`).join('')}</div>
+    <div style="height:48px"></div>${$('rules').innerHTML}</article>`
 }
 
-function render(what = 'all') {
-  document.documentElement.dataset.theme = S.theme
+function sync() {
   document.querySelectorAll('.seg[data-key]').forEach(g => g.querySelectorAll('button').forEach(b =>
     b.setAttribute('aria-pressed', String(S[g.dataset.key]) === b.dataset.v)))
+}
+function render(what = 'all') {
+  document.documentElement.dataset.theme = S.theme
   $('pincount').textContent = S.pins.length || ''
-  $('meta').textContent = `${ICONS.length} icons · ${ICONS.filter(i => i.d).length} drawn · radius ${RADIUS}`
-  if (what !== 'ins') ({compare: renderCompare, rules: renderRules}[S.mode] || renderBrowse)()
+  $('issuecount').textContent = problemIcons().length || ''
+  $('meta').textContent = `${ICONS.length} icons, ${ICONS.filter(i => i.d).length} hand-drawn. Corner radius ${RADIUS} px, set when the set is built.`
+  if (what !== 'ins') ({compare: renderCompare, rules: renderRules, dash: renderDash, motion: renderMotion, issues: renderIssues}[S.mode] || renderBrowse)()
   renderInspector()
-  document.querySelectorAll('.seg[data-key=stage] button').forEach(b => b.setAttribute('aria-pressed', S.stage === b.dataset.v))
+  sync()
   try { localStorage.setItem('ha-icons-sheet', JSON.stringify(S)) } catch {}
 }
 
 function select(n, scroll) {
   S.sel = n
-  document.querySelectorAll('.cell').forEach(c => c.setAttribute('aria-current', c.dataset.n === n))
+  document.querySelectorAll('.cell,.dtile,.motions button,.issues .relchip').forEach(c => c.setAttribute('aria-current', c.dataset.n === n))
   if (scroll) document.querySelector(`.cell[data-n="${n}"]`)?.scrollIntoView({block: 'nearest'})
   render('ins')
 }
 function step(by) {
-  const list = S.mode === 'compare' ? S.pins.map(n => byName[n]) : visible()
+  const list = S.mode === 'compare' ? S.pins.map(n => byName[n]) : ordered()
   if (!list.length) return
   const at = list.findIndex(i => i.n === S.sel)
   select(list[(at + by + list.length) % list.length].n, true)
@@ -322,16 +556,24 @@ document.addEventListener('click', e => {
   if (seg) {
     S[seg.dataset.key] = t.dataset.v
     if (seg.dataset.key === 'variant') S.stageV = t.dataset.v
-    return render()
+    return render(seg.dataset.key === 'tab' ? 'ins' : 'all')
   }
   if (t.dataset.filter) { S.filter = t.dataset.filter; return render() }
   if (t.dataset.uses) { Object.assign(S, {uses: t.dataset.uses, mode: 'browse', filter: 'all', q: ''}); $('q').value = ''; return render() }
   if ('clearuses' in t.dataset) { S.uses = ''; return render() }
+  if (t.dataset.rule) { Object.assign(S, {rule: t.dataset.rule, uses: '', mode: 'browse', filter: 'all', q: ''}); $('q').value = ''; return render() }
+  if ('clearrule' in t.dataset) { S.rule = ''; return render() }
+  if ('animate' in t.dataset) { S.animate = !S.animate; return render() }
   if (t.dataset.unpin) return togglePin(t.dataset.unpin)
+  if ('pause' in t.dataset) { t.setAttribute('aria-pressed', document.body.classList.toggle('paused')); return }
   if (t.dataset.step) return step(+t.dataset.step)
   if ('pin' in t.dataset) return togglePin(S.sel)
   if (t.dataset.stagev) { S.stageV = t.dataset.stagev; return render('ins') }
   if (t.dataset.n) (e.shiftKey || e.altKey) ? togglePin(t.dataset.n) : select(t.dataset.n, true)
+})
+document.addEventListener('click', e => {  // the View menu closes when you click away from it
+  const pop = document.querySelector('.pop')
+  if (pop.open && !pop.contains(e.target)) pop.open = false
 })
 document.addEventListener('change', e => {
   if (e.target.dataset.toggle) { S[e.target.dataset.toggle] = e.target.checked; render('ins') }

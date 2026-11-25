@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait">
-  <path d="M7 17V8A5 5 0 0 1 17 8V17"/>
-  <path d="M5 17H19"/>
-  <path d="M11 21H13"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait" data-motion="The bell swings and the clapper follows">
+  <g data-anim="ring">
+    <path d="M7 17V8A5 5 0 0 1 17 8V17"/>
+    <path d="M5 17H19"/>
+  </g>
+  <path d="M11 21H13" data-anim="clapper"/>
 </svg>

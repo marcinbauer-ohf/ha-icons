@@ -35,18 +35,19 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 - Rectangles are rounded with `rx`. An `rx` above 2 means a pill and stays a pill. (build)
 - A filled shape that is not a rectangle is drawn inset by the radius with a same-colour stroke of twice the radius. (build)
 - A stroked polygon gets rounded centreline corners from `data-r`. Plain joins only round the outside by 1 px. (build)
-- The radius is a build setting: `uv run build.py --radius N` re-renders the whole set. The useful range is 0 to 2. (build)
+- The radius is a build setting, 4 px by default: `uv run build.py --radius N` re-renders the whole set. Rectangles and filled shapes scale with it. A pointed or thin filled shape that would lose more than a tenth of its area keeps the 2 px radius it was drawn with, and 2 px lines cannot get rounder than fully round. (build)
 
 ## Filled variant
 
 - Built from solid masses. Detail is cut out as negative space, not drawn as extra lines. (by eye)
 - A cut-out is never smaller than 2 x 2 px. (lint)
 - Avoid large blobs and avoid slivers thinner than 2 px. (by eye)
+- A large, plain, rounded mass may carry one glint: a short 2 px arc cut out near its edge, following the curve (the bulb, the water drop, the shield). It never goes bottom right, where a badge would cut it away, and it is left out when it would crowd other detail, as in `shield-check`. The stroked variant draws the arc as a line only where it keeps a clear gap to the outline; the stroked water drop is too small for one. (by eye)
 
 ## Stroked variant
 
 - Same skeleton and proportions as the filled variant, `fill="none"` on the root, 2 px strokes. (lint for the attributes, by eye for the proportions)
-- Pure line glyphs (close, plus, check, chevrons) are the same drawing in both variants. (by eye)
+- An icon that is just strokes (close, plus, check, chevrons, arrows, reload, chart-line, wifi, snowflake, sleep) is the same drawing in both variants: 2 px lines, with nothing to fill. It has one authoring file, `icons/<name>.stroked.svg`, and the build uses it for the filled set too. (build)
 
 ## Spacing
 
@@ -67,17 +68,31 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 
 - Each modifier has one fixed glyph, size and position across the set. (build)
 - A modifier badge may sit 1 px into the padding, so paint may reach 23. (lint allows it)
-- The cut that makes room for a badge hugs the badge, with a 1 px gap at the closest point. It never takes a whole corner out of the base. (build)
-- A badge cut must not break an existing cut-out. If the cut would open a cut-out (the lock's keyhole, the house's door) or leave a wall under 2 px beside it, the cut-out is filled in instead. Filled variant only. (build)
+- The cut that makes room for a badge hugs the badge, with a 2 px gap at the closest point. It never takes a whole corner out of the base. (build)
+- The off slash lies over the icon. On its lower-left side it merges with the base; only its upper-right side is cut back, by about 2 px. (build)
+- A cut-out keeps a 2 px wall to a badge cut. The part of a cut-out that comes closer is filled in, so a clock or timer keeps most of its hands. If less than half of the cut-out would be left, or less than 2 x 2 px, it is filled in completely and the build flags the icon. Filled variant only. The off slash is the exception: it is meant to cross the icon, cut-outs included. (build)
 - A badge cut must not leave sharp corners. Corners and line ends created by the cut are rounded. (build)
-- A badge cut must not nick the base. If it removes under 4 px² of the base, the icon is flagged and needs a hand-drawn version. (build warns)
-- Fragments under 2 x 2 px left behind by a cut are dropped. (build)
+- A cut never takes under 1 px² from any part of the icon. This is judged per piece: where the cut would only graze a part (the edge of the head in `account-lock`), that part is left whole, and the cut still applies where it takes a real bite. (build)
+- A badge cut must not nick the base. If it removes between 1 and 4 px² of the base, the icon is flagged and needs a hand-drawn version. (build warns)
+- A piece that a cut splits off or whittles down to under 8 px² (a 2 px line shorter than 4 px) is too small to read and is removed. Parts the cut never touched are kept, however small. (build)
 - A suffix is only a modifier when it means one. `toggle-switch-off` is a state, so it is drawn by hand. (by eye)
+- The badge keeps its corner. When it would cover the part that identifies the icon (the handle of the magnifier in `magnify-plus`), that part is moved or mirrored in a hand-drawn version so both stay visible. (by eye)
+- When a line of the icon runs parallel to the off slash and would vanish into it (the arrowhead in `download-off`), the icon is redrawn by hand with that part clear of the slash. (by eye)
 - When the build cannot make a derived icon work, draw it by hand: add `icons/<name>.filled.svg` and `icons/<name>.stroked.svg`. A hand-drawn file always wins. (build)
 
 ## Reuse
 
 - An icon that reuses another icon records it. Derived icons record their base and modifier automatically; hand-drawn ones list them in `data-uses="name:role"`, with roles `base`, `badge` or `cutout`. The relationships are written to `dist/relations.json`. (build)
+
+## Motion (experiment)
+
+- The main body of an icon is always visible. An icon never fades, slides or scales in as a whole. (by eye)
+- Only parts move, and the movement says what the thing does: fan blades spin, wifi waves light up, a bell swings. (by eye)
+- Motion is for an active state. An idle icon stands still. (by eye)
+- Parts that move are marked in the authoring file with `data-anim`, and the root describes the movement in `data-motion`. The keyframes live in the preview template. (build)
+- Motion stops when the viewer has asked for reduced motion. (build)
+- The static icon must be complete on its own; motion never carries the meaning alone. (by eye)
+- A part that only exists while the icon moves (the charge level in `battery`) is marked `display="none"`, so the static icon and the built path never show it. (build)
 
 ## Outline names
 

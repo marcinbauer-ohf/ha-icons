@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="landscape">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="landscape" data-motion="The sound waves pulse out of the speaker">
   <polygon points="4,9 8,9 12,5 12,19 8,15 4,15" stroke="currentColor" stroke-width="2"/>
-  <path d="M15 9A5 5 0 0 1 15 15M19 6A10 10 0 0 1 19 18" fill="none" stroke="currentColor" stroke-width="2"/>
+  <path d="M15 9A5 5 0 0 1 15 15" fill="none" stroke="currentColor" stroke-width="2" data-anim="wave-1"/>
+  <path d="M19 6A10 10 0 0 1 19 18" fill="none" stroke="currentColor" stroke-width="2" data-anim="wave-2"/>
 </svg>

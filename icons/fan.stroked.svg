@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="circle">
-  <circle cx="12" cy="7" r="3"/>
-  <circle cx="17" cy="17" r="3"/>
-  <circle cx="7" cy="17" r="3"/>
-  <circle cx="12" cy="13" r="1" fill="currentColor" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="circle" data-motion="The blades spin">
+  <g data-anim="spin">
+    <path d="M14 3A4 4 0 0 1 14 11Z"/>
+    <path d="M21 14A4 4 0 0 1 13 14Z"/>
+    <path d="M10 21A4 4 0 0 1 10 13Z"/>
+    <path d="M3 10A4 4 0 0 1 11 10Z"/>
+    <circle cx="12" cy="12" r="1"/>
+  </g>
 </svg>

@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="landscape">
-  <path d="M3 7A15 15 0 0 1 21 7M6 11A10 10 0 0 1 18 11M8 16A5 5 0 0 1 16 16"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="landscape" data-motion="The waves light up from the dot outward">
+  <path d="M8 16A5 5 0 0 1 16 16" data-anim="wave-1"/>
+  <path d="M6 11A10 10 0 0 1 18 11" data-anim="wave-2"/>
+  <path d="M3 7A15 15 0 0 1 21 7" data-anim="wave-3"/>
   <circle cx="12" cy="19" r="1"/>
 </svg>

@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="landscape">
-  <path d="M4 12A10 10 0 0 1 20 12A10 10 0 0 1 4 12Z"/>
-  <circle cx="12" cy="12" r="1"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-exceptions="the arc centres sit off the pixel grid so the eye can be taller" data-motion="The eye blinks" data-keyline="landscape">
+  <g data-anim="blink">
+    <path d="M3 12A10 10 0 0 1 21 12A10 10 0 0 1 3 12Z"/>
+    <circle cx="12" cy="12" r="2"/>
+  </g>
 </svg>

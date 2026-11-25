@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait">
-  <rect x="6" y="5" width="12" height="17" rx="2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-motion="The charge level rises" data-keyline="portrait">
+  <mask id="c"><rect width="24" height="24" fill="#fff"/><rect x="8" y="7" width="8" height="13" fill="#000" display="none" data-anim="charge"/></mask>
+  <g mask="url(#c)">
+    <rect x="6" y="5" width="12" height="17" rx="2"/>
+  </g>
   <rect x="9" y="2" width="6" height="2" rx="1"/>
 </svg>

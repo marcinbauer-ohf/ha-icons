@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="circle">
-  <mask id="c"><rect width="24" height="24" fill="#fff"/><circle cx="12" cy="13" r="1" fill="#000"/></mask>
-  <g mask="url(#c)">
-    <circle cx="12" cy="7" r="4"/>
-    <circle cx="17" cy="17" r="4"/>
-    <circle cx="7" cy="17" r="4"/>
-    <circle cx="12" cy="13" r="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="circle" data-motion="The blades spin">
+  <g data-anim="spin">
+    <path d="M14 3A4 4 0 0 1 14 11Z" stroke="currentColor" stroke-width="2"/>
+    <path d="M21 14A4 4 0 0 1 13 14Z" stroke="currentColor" stroke-width="2"/>
+    <path d="M10 21A4 4 0 0 1 10 13Z" stroke="currentColor" stroke-width="2"/>
+    <path d="M3 10A4 4 0 0 1 11 10Z" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="12" r="2"/>
   </g>
 </svg>

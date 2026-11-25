@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait">
-  <rect x="7" y="3" width="10" height="18" rx="2"/>
-  <circle cx="14" cy="12" r="1" fill="currentColor" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-motion="The door swings on its hinge side" data-keyline="portrait">
+  <g data-anim="swing">
+    <rect x="7" y="3" width="10" height="18" rx="2"/>
+    <circle cx="14" cy="12" r="1" fill="currentColor" stroke="none"/>
+  </g>
 </svg>

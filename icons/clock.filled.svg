@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="circle">
-  <mask id="c"><rect width="24" height="24" fill="#fff"/><polyline points="12,7 12,12 15,15" fill="none" stroke="#000" stroke-width="2"/></mask>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="circle" data-motion="The hands turn">
+  <mask id="c"><rect width="24" height="24" fill="#fff"/><path d="M12 7V12" fill="none" stroke="#000" stroke-width="2" data-anim="hand-m"/><path d="M12 12L15 15" fill="none" stroke="#000" stroke-width="2" data-anim="hand-h"/></mask>
   <g mask="url(#c)">
     <circle cx="12" cy="12" r="10"/>
   </g>

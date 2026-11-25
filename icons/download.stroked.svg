@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="square">
-    <path d="M12 4V14"/>
-    <polyline points="7,9 12,14 17,9"/>
-    <path d="M5 20H19"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="square" data-motion="The arrow drops toward the tray">
+  <g data-anim="drop">
+      <path d="M12 4V14"/>
+      <polyline points="7,9 12,14 17,9"/>
+    </g>
+  <path d="M5 20H19"/>
 </svg>

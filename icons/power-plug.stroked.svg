@@ -1,5 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait">
   <path d="M9 3V8M15 3V8"/>
-  <rect x="7" y="8" width="10" height="6" rx="2"/>
-  <path d="M12 14V21"/>
+  <polygon points="7,8 17,8 17,13 13,17 13,21 11,21 11,17 7,13" data-r="2"/>
 </svg>

@@ -4,8 +4,9 @@
 # ///
 """Lint authoring SVGs in icons/, flatten each to one filled path, write dist/.
 
-Run: uv run build.py [--radius 2]
-  icons/<name>.<filled|stroked>.svg   authoring source (hand drawn)
+Run: uv run build.py [--radius 4]
+  icons/<name>.<filled|stroked>.svg   authoring source (hand drawn); with only a stroked file, both variants use it
+  proposals/                          alternative drawings under review: previewed, never shipped
   dist/svg/                           authoring SVG for every built name (incl. composed)
   dist/<variant>.json                 {name: single path d}
   dist/relations.json                 {name: {uses: [{icon, role}], used_in: [names]}}
@@ -23,30 +24,47 @@ VARIANTS = ("filled", "stroked")
 SHAPES = {"rect", "circle", "line", "polyline", "polygon", "path"}
 ATTRS = {"viewBox", "fill", "stroke", "stroke-width", "stroke-linejoin", "stroke-linecap", "x", "y", "width",
          "height", "rx", "cx", "cy", "r", "x1", "y1", "x2", "y2", "points", "d", "id", "mask",
-         "data-keyline", "data-overflow", "data-exceptions", "data-r", "data-uses"}
+         "data-keyline", "data-overflow", "data-exceptions", "data-r", "data-uses", "data-anim", "data-motion", "display"}
 NUM = r"-?\d*\.?\d+"
-# Corner radius. Authoring SVGs are drawn for radius 2; --radius re-renders the whole set at another value.
+# Corner radius. Authoring SVGs are drawn for radius 2; the build renders at --radius (default 4).
 # K scales every rounding: rect rx, polygon data-r, the stroke on filled masses, and line joins and caps.
-K = 1.0
+K = 2.0
 
 # Modifier kit: one fixed glyph + one fixed cut per suffix, shared by every icon and both variants.
 # Badges sit 1 px into the padding (paint up to 23) so the base icon keeps more room.
-# Each cut hugs its glyph (1 px gap at the closest point) so it never takes more of the base than it needs.
+# Each cut hugs its glyph with a 2 px gap at the closest point, so it never takes more of the base than it needs.
 G = 'fill="none" stroke="currentColor" stroke-width="2"'
-CUT = 'fill="none" stroke="#000" stroke-width="4"'
-ROUND_CUT = '<circle cx="19" cy="19" r="5" fill="#000" stroke="none"/>'
+CUT = 'fill="none" stroke="#000" stroke-width="6"'
+ROUND_CUT = '<circle cx="19" cy="19" r="6" fill="#000" stroke="none"/>'
 MODS = {
     "plus": (f'<path d="M16 19H22M19 16V22" {G}/>', ROUND_CUT),
     "minus": (f'<path d="M16 19H22" {G}/>', f'<path d="M16 19H22" {CUT}/>'),
     "check": (f'<polyline points="16,19 18,21 21,18" {G}/>', ROUND_CUT),
     "alert": (f'<path d="M19 16V19" {G}/><circle cx="19" cy="22" r="1" fill="currentColor" stroke="none"/>',
               f'<path d="M19 16V22" {CUT}/>'),
-    "lock": ('<rect x="15" y="18" width="8" height="5" rx="1" fill="currentColor" stroke="none"/>'
-             f'<path d="M17 18V15A2 2 0 0 1 21 15V18" {G}/>',
-             '<rect x="14" y="11" width="10" height="13" rx="2" fill="#000" stroke="none"/>'),
-    "off": (f'<path d="M4 4L20 20" {G}/>', f'<path d="M4 4L20 20" {CUT}/>'),
+    "lock": ('<rect x="15" y="17" width="8" height="6" rx="1" fill="currentColor" stroke="none"/>'
+             f'<path d="M17 17V16A2 2 0 0 1 21 16V17" {G}/>',  # low shackle: the opening is exactly 2 x 2
+             '<rect x="13" y="11" width="11" height="13" rx="2" fill="#000" stroke="none"/>'),
+    # the slash lies over the icon: it merges with the base on its lower-left side and only the
+    # upper-right side is cut back (the cut is the slash moved 1 px up and right, 4 wide: a gap of about 2 px)
+    "off": (f'<path d="M4 4L20 20" {G}/>', '<path d="M5 3L21 19" fill="none" stroke="#000" stroke-width="4"/>'),
 }
 WARNINGS = []  # filled by modifier_cut, drained per icon in main
+APPLIED = set()  # rule ids that fired while building the current icon, drained per icon in main
+# Rules an icon can be shown to use, in display order: id -> label. See RULES.md for the full wording.
+RULE_LABELS = {
+    "keyline-circle": "Circle keyline", "keyline-square": "Square keyline",
+    "keyline-portrait": "Portrait keyline", "keyline-landscape": "Landscape keyline",
+    "cutout": "Detail cut out as negative space", "mass": "Inset shape with a rounding stroke",
+    "rx": "Rounded rectangle", "pill": "Pill (radius above 2)", "fillet": "Rounded centreline corners (data-r)",
+    "arc": "Arcs on a whole-pixel centre", "strokes-only": "Just strokes: filled is the same as stroked", "heavy": "4 px strokes in the filled variant",
+    "overflow": "Reaches into the padding", "exception": "Whole-number exception",
+    "reuse": "Reuses another icon", "badge": "Modifier badge, cut with a 2 px gap", "off": "Off slash lies over the icon",
+    "hole-trimmed": "Cut-out shortened to make room for a badge", "hole-filled": "Cut-out filled to make room for a badge", "cut-skipped": "Cut skipped where it would take under 1 px²",
+    "nick": "Cut only nicks the base (flagged)", "crumbs": "Leftover pieces too small to see removed",
+    "hand-override": "Hand-drawn in place of a derived icon", "alias": "Stands in for an -outline name",
+    "motion": "Has moving parts",
+}
 
 
 def op(a, b, how):
@@ -172,9 +190,15 @@ def mass_region(g, nominal):
     if rho < nominal:
         core = op(g, stroked(g, 2 * (nominal - rho), LineCap.BUTT_CAP, LineJoin.MITER_JOIN), PathOp.UNION)
     else:
+        drawn = op(g, stroked(g, 2 * nominal), PathOp.UNION)
         core = op(g, stroked(g, 2 * (rho - nominal)), PathOp.DIFFERENCE)
         if not contours(core):  # too thin to take this much rounding: keep it as drawn
-            return op(g, stroked(g, 2 * nominal), PathOp.UNION)
+            return drawn
+        rounder = op(core, stroked(core, 2 * rho), PathOp.UNION)
+        size = lambda p: abs(sum(map(signed_area, contours(p))))
+        # A pointed or thin shape (bolt, star, play) loses its tips to a big radius and turns into a blob.
+        # If more than a tenth of it would go, it keeps the radius it was drawn with.
+        return rounder if size(rounder) >= 0.9 * size(drawn) else drawn
     return op(core, stroked(core, 2 * rho), PathOp.UNION) if rho > 1e-6 else core
 
 
@@ -189,12 +213,14 @@ def area(el, style, ids):
     """Painted region of an element as a Path. Masks subtract their non-white children."""
     style = {**style, **{k: el.get(k) for k in ("fill", "stroke", "stroke-width") if el.get(k)}}
     t = tag(el)
+    if el.get("display") == "none":  # a part that only exists while the icon is animated
+        return Path()
     if t in ("svg", "g"):
         out = union(area(c, style, ids) for c in el if tag(c) != "mask")
         if m := el.get("mask"):
             cut = union(area(c, style, ids) for c in ids[m[5:-1]] if c.get("fill") != "#fff")
             if m.startswith("url(#mod-"):
-                return modifier_cut(out, cut, solid=style.get("fill") != "none")
+                return modifier_cut(out, cut, solid=style.get("fill") != "none" and m != "url(#mod-off)")
             out = op(out, cut, PathOp.DIFFERENCE)
         return out
     filled = style.get("fill") != "none" and t != "line"
@@ -273,9 +299,11 @@ def lint_source(root, variant):
                 errs.append(f"attribute {k} not allowed")
             if k in ("fill", "stroke") and v not in (("#fff", "#000", "none") if in_mask else ("currentColor", "none")):
                 errs.append(f'{k}="{v}" not allowed {"inside" if in_mask else "outside"} a mask')
+            if k == "display" and (v != "none" or not el.get("data-anim")):
+                errs.append('display is only allowed as display="none" on a part that has data-anim')
             if k == "data-r" and t != "polygon":
                 errs.append("data-r (corner radius) is only supported on <polygon>")
-            if k == "stroke-width" and v not in ("2", "4"):
+            if k == "stroke-width" and v not in ("2", "4") and not (in_mask and v == "6"):
                 errs.append(f"stroke-width {v} (only 2 or 4)")
             if k == "stroke-width" and v == "4" and variant == "stroked" and not in_mask:
                 errs.append("stroke-width 4 is for filled masses, not the stroked variant")
@@ -357,6 +385,7 @@ def without_crumbs(p):
     keep = []
     if not any(not hole for hole, *_ in small_parts(p, keep)):
         return p
+    APPLIED.add("crumbs")
     return to_path(keep)
 
 
@@ -364,16 +393,47 @@ def modifier_cut(base, cut, solid):
     """Cut a modifier badge's space out of a base icon without leaving damage (see RULES.md, Modifiers)."""
     cs = contours(base)
     outer = math.copysign(1, max(map(signed_area, cs), key=abs)) if cs else 1
+    size = lambda p: abs(sum(map(signed_area, contours(p)))) / 2
+    box = lambda c: [f(q[i] for s in c for q in s[1:]) for f in (min, max) for i in (0, 1)]
     if solid:
-        # A cut-out the badge would open, or leave a wall under 2 px next to, is filled in instead.
+        # A cut-out must keep a 2 px wall to the badge cut. The part of it that comes closer is filled in,
+        # so a clock keeps most of its hands. If less than half would be left, or under 2 x 2, all of it goes.
+        near = op(cut, stroked(cut, 4), PathOp.UNION)
         for c in cs:
             hole = to_path([c])
-            if signed_area(c) * outer < 0 and contours(op(op(hole, stroked(hole, 4), PathOp.UNION), cut, PathOp.INTERSECTION)):
+            if signed_area(c) * outer >= 0 or not contours(op(hole, near, PathOp.INTERSECTION)):
+                continue
+            rest = contours(op(hole, near, PathOp.DIFFERENCE))
+            x0, y0, x1, y1 = box(rest[0]) if len(rest) == 1 else (0, 0, 0, 0)
+            if len(rest) == 1 and min(x1 - x0, y1 - y0) >= 1.98 and size(to_path(rest)) >= 0.5 * size(hole):
+                base = op(base, op(hole, near, PathOp.INTERSECTION), PathOp.UNION)
+                APPLIED.add("hole-trimmed")
+            else:
                 base = op(base, hole, PathOp.UNION)
-    taken = sum(abs(signed_area(c)) for c in contours(op(base, cut, PathOp.INTERSECTION))) / 2
-    if 0.5 < taken < 4:  # under half a square pixel is a graze nobody can see
+                WARNINGS.append("a cut-out was filled in to make room for the badge; check the icon still reads")
+                APPLIED.add("hole-filled")
+    islands = [box(c) for c in contours(base) if signed_area(c) * outer > 0]
+    # What the cut would remove, piece by piece. A piece under 1 px² is a nick on some part of the icon
+    # (the edge of the head in account-lock): that piece is left alone and only the real bites are cut.
+    pieces = [(abs(signed_area(c)) / 2, c) for c in contours(op(base, cut, PathOp.INTERSECTION))]
+    spared = [c for a, c in pieces if 0 < a < 1]
+    taken = sum(a for a, _ in pieces if a >= 1)
+    if spared:
+        APPLIED.add("cut-skipped")
+    if not taken:
+        return base
+    if taken < 4:
+        APPLIED.add("nick")
         WARNINGS.append(f"modifier cut only nicks the base ({taken:.1f} px²); draw this icon by hand")
-    out = op(base, cut, PathOp.DIFFERENCE)
+    out = op(op(base, cut, PathOp.DIFFERENCE), to_path(spared), PathOp.UNION) if spared else op(base, cut, PathOp.DIFFERENCE)
+    # A piece the cut has split off or whittled down to under 8 px² (a 2 px line shorter than 4 px) is too
+    # small to read and just floats there: remove it. Parts of the icon the cut never touched are kept.
+    sign = math.copysign(1, max(map(signed_area, contours(out)), key=abs)) if contours(out) else 1
+    for c in contours(out):
+        untouched = any(all(abs(a - b) < 0.05 for a, b in zip(box(c), i)) for i in islands)
+        if signed_area(c) * sign > 0 and abs(signed_area(c)) / 2 < 8 and not untouched:
+            out = op(out, to_path([c]), PathOp.DIFFERENCE)
+            APPLIED.add("crumbs")
     r = 0.75 * min(K, 1)  # under half a 2 px line, so a cut line keeps a solid core while its end rounds off
     if r < 0.05 or not contours(out):
         return out
@@ -391,10 +451,18 @@ def modifier_cut(base, cut, solid):
     return op(op(out, near, PathOp.DIFFERENCE), op(opened, near, PathOp.INTERSECTION), PathOp.UNION)
 
 
+def hand_file(name, variant):
+    """The hand-drawn authoring file, from icons/ or from proposals/ (alternatives still under review)."""
+    for folder in ("icons", "proposals"):
+        for v in (variant, "stroked"):  # an icon that is just strokes has one drawing, used for both variants
+            f = ROOT / folder / f"{name}.{v}.svg"
+            if f.exists():
+                return f
+
+
 def source(name, variant):
     """Authoring SVG text: hand-drawn file, else base + modifier."""
-    f = ROOT / "icons" / f"{name}.{variant}.svg"
-    if f.exists():
+    if f := hand_file(name, variant):
         return f.read_text()
     base, _, suffix = name.rpartition("-")
     if not base:
@@ -405,6 +473,32 @@ def source(name, variant):
         return (f'{head}<mask id="mod-{suffix}"><rect width="24" height="24" fill="#fff"/>{cut}</mask>'
                 f'<g mask="url(#mod-{suffix})">{body.strip()}</g>{glyph}</svg>\n')
     return None
+
+
+def source_rules(root):
+    """Rule ids that can be read straight off an authoring SVG."""
+    found = {f"keyline-{root.get('data-keyline')}"} if root.get("data-keyline") else set()
+    for attr, rule in (("data-overflow", "overflow"), ("data-exceptions", "exception"), ("data-uses", "reuse")):
+        if root.get(attr):
+            found.add(rule)
+    for el in root.iter():
+        t, mid = tag(el), el.get("id", "")
+        if t == "mask":
+            found.add("off" if mid == "mod-off" else "badge" if mid.startswith("mod-") else "cutout")
+        if el.get("data-anim"):
+            found.add("motion")
+        if el.get("data-r"):
+            found.add("fillet")
+        if t == "rect" and el.get("rx"):
+            found.add("pill" if float(el.get("rx")) > 2 else "rx")
+        if t == "path" and "A" in el.get("d", ""):
+            found.add("arc")
+        if el.get("stroke") == "currentColor" and el.get("stroke-width") and root.get("fill") != "none":
+            if el.get("fill") != "none":
+                found.add("mass")
+            elif el.get("stroke-width") == "4":
+                found.add("heavy")
+    return found
 
 
 def uses(name, drawn):
@@ -439,10 +533,11 @@ def markdown(text):
 def main():
     global K
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--radius", type=float, default=2, help="corner radius in px (default 2, the radius the icons are drawn for)")
+    ap.add_argument("--radius", type=float, default=4, help="corner radius in px (default 4; the authoring files are drawn at 2 and scaled)")
     radius = ap.parse_args().radius
     K = radius / 2
-    drawn = sorted({f.name.split(".")[0] for f in (ROOT / "icons").glob("*.svg")})
+    proposed = {f.name.split(".")[0] for f in (ROOT / "proposals").glob("*.svg")}
+    drawn = sorted({f.name.split(".")[0] for f in (ROOT / "icons").glob("*.svg")} | proposed)
     wanted = json.loads((ROOT / "ha-default-icons.json").read_text())
     bases = {n[:-8] for n in wanted if n.endswith("-outline")}  # built so the outline name has something to alias
     names = [n for n in sorted(set(drawn) | set(wanted) | bases) if source(n, "filled") and source(n, "stroked")]
@@ -452,14 +547,14 @@ def main():
     aliases = {n: n[:-8] for n in sorted(wanted) if n.endswith("-outline") and n not in names and n[:-8] in names}
     dist = ROOT / "dist"
     (dist / "svg").mkdir(parents=True, exist_ok=True)
-    out, defs, meta, failed = {v: {} for v in VARIANTS}, [], [], 0
+    out, defs, meta, anim, failed = {v: {} for v in VARIANTS}, [], [], {}, 0
     for name in names:
-        cells, notes = [], []
+        cells, notes, rules = [], [], set()
         for v in VARIANTS:
             src = source(name, v)
             root = ET.fromstring(src)
             ids = {el.get("id"): el for el in root.iter() if el.get("id")}
-            hand = (ROOT / "icons" / f"{name}.{v}.svg").exists()
+            hand = bool(hand_file(name, v))
             errs = lint_source(root, v) if hand else []
             try:
                 p = area(root, {}, ids)
@@ -473,9 +568,12 @@ def main():
                 errs.append(f"flatten failed: {e}")
                 d = ""
             (dist / "svg" / f"{name}.{v}.svg").write_text(src)
-            out[v][name] = d
+            if name not in proposed:  # proposals are shown in the preview but are not part of the shipped set
+                out[v][name] = d
             notes += [f"{v}: {w}" for w in WARNINGS]
             WARNINGS.clear()
+            rules |= source_rules(root) | APPLIED
+            APPLIED.clear()
             for k in ("overflow", "exceptions"):
                 if root.get(f"data-{k}"):
                     notes.append(f"{v} {k}: {root.get(f'data-{k}')}")
@@ -484,22 +582,35 @@ def main():
             cells.append(d)
         for n in notes:
             print(f"{name}: {n}")
+        if name in drawn and name.rpartition("-")[2] in MODS and source(name.rpartition("-")[0], "filled"):
+            rules.add("hand-override")
+        if name in drawn and hand_file(name, "filled") == hand_file(name, "stroked"):
+            rules.add("strokes-only")
+        if name in aliases.values():
+            rules.add("alias")
+        if uses(name, drawn):
+            rules.add("reuse")
         mdi_file = ROOT / "vendor" / "mdi" / "svg" / f"{name}.svg"
         mdi = re.search(r' d="([^"]*)"', mdi_file.read_text()).group(1) if mdi_file.exists() else ""
         # each path is written once as a <symbol>; the sheet's script reuses it at every size
         defs.append("".join(f'<symbol id="{name}-{k}" viewBox="0 0 24 24"><path d="{d}"/></symbol>'
                             for k, d in (("filled", cells[0]), ("stroked", cells[1]), ("mdi", mdi)) if d))
         meta.append({"n": name, "d": name in drawn, "b": name.rpartition("-")[0], "m": bool(mdi), "e": any(n.startswith("ERROR") for n in notes),
-                     "k": ET.fromstring(source(name, "filled")).get("data-keyline", "?"), "u": uses(name, drawn),
+                     "k": ET.fromstring(source(name, "filled")).get("data-keyline", "?"), "u": uses(name, drawn), "p": name in proposed,
+                     "r": [r for r in RULE_LABELS if r in rules],
                      "s": [len(cells[0]), len(cells[1]), len(mdi)], "t": notes})
+        if name in drawn and "data-anim" in source(name, "filled"):
+            # the preview animates the authoring SVG, because the flattened path has no separate parts to move
+            meta[-1]["a"] = ET.fromstring(source(name, "filled")).get("data-motion", "")
+            anim[name] = {v: source(name, v).replace('id="c"', f'id="{name}-{v}-c"').replace("url(#c)", f"url(#{name}-{v}-c)") for v in VARIANTS}
     for v in VARIANTS:
         (dist / f"{v}.json").write_text(json.dumps(out[v], indent=0))
     (dist / "outline-aliases.json").write_text(json.dumps(aliases, indent=0))
-    relations = {m["n"]: {"uses": [{"icon": n, "role": r} for n, r in m["u"]],
+    relations = {m["n"]: {"rules": m["r"], "uses": [{"icon": n, "role": r} for n, r in m["u"]],
                           "used_in": [o["n"] for o in meta if any(n == m["n"] for n, _ in o["u"])]} for m in meta}
     (dist / "relations.json").write_text(json.dumps(relations, indent=1))
     page = (ROOT / "sheet.template.html").read_text()
-    for k, v in (("defs", "".join(defs)), ("data", json.dumps(meta)), ("radius", f"{radius:g}"),
+    for k, v in (("defs", "".join(defs)), ("data", json.dumps(meta)), ("anim", json.dumps(anim)), ("rulelabels", json.dumps(RULE_LABELS)), ("radius", f"{radius:g}"),
                  ("rules", markdown((ROOT / "RULES.md").read_text()))):
         page = page.replace("{{" + k + "}}", v)
     (dist / "sheet.html").write_text(page)
