@@ -1,0 +1,36 @@
+name: Preview
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Fetch MDI originals for the comparison
+        run: mkdir -p vendor/mdi && npm pack @mdi/svg --pack-destination vendor && tar -xzf vendor/mdi-svg-*.tgz -C vendor/mdi --strip-components=1
+      - name: Build
+        # Lint errors exit non-zero but still write the sheet, which shows them; publish anyway.
+        run: uv run build.py || true
+      - run: mkdir site && cp dist/sheet.html site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
