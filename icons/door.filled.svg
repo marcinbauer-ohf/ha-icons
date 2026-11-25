@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-motion="The door swings on its hinge side" data-keyline="portrait">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-motion="The door swings open and shows its frame" data-keyline="portrait">
   <mask id="c"><rect width="24" height="24" fill="#fff"/><circle cx="15" cy="12" r="1" fill="#000"/></mask>
+  <rect x="7" y="3" width="10" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2" display="none" data-anim="frame"/>
   <g mask="url(#c)" data-anim="swing">
     <rect x="6" y="2" width="12" height="20" rx="2"/>
   </g>

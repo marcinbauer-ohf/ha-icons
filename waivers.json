@@ -1,0 +1,17 @@
+{
+  "flash-off": {
+    "gap": "The slash leaves a narrow pocket beside the bolt. Reviewed and accepted."
+  },
+  "star-off": {
+    "gap": "The slash leaves a narrow pocket beside a star arm. Reviewed and accepted."
+  },
+  "map-marker-minus": {
+    "nick": "The minus only nicks the pin's side. Reviewed and accepted."
+  },
+  "lightbulb-off": {
+    "gap": "The slash leaves a narrow pocket beside the bulb. Reviewed and accepted."
+  },
+  "lock-off": {
+    "gap": "The slash leaves a narrow pocket beside the shackle. Reviewed and accepted."
+  }
+}

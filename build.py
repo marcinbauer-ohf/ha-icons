@@ -9,6 +9,7 @@ Run: uv run build.py [--radius 4]
   proposals/                          alternative drawings under review: previewed, never shipped
   dist/svg/                           authoring SVG for every built name (incl. composed)
   dist/<variant>.json                 {name: single path d}
+  waivers.json                        {icon: {rule key: reason}}: rules knowingly not applied to one icon
   dist/metadata.json                  Pictogrammers categories, aliases, author and version for each name
   dist/relations.json                 {name: {uses: [{icon, role}], used_in: [names]}}
   dist/outline-aliases.json           {mdi -outline name: base name whose stroked variant replaces it}
@@ -64,7 +65,7 @@ RULE_LABELS = {
     "hole-trimmed": "Cut-out shortened to make room for a badge", "hole-filled": "Cut-out filled to make room for a badge", "cut-skipped": "Cut skipped where it would take under 1 px²",
     "nick": "Cut only nicks the base (flagged)", "crumbs": "Leftover pieces too small to see removed",
     "hand-override": "Hand-drawn in place of a derived icon", "alias": "Stands in for an -outline name",
-    "motion": "Has moving parts",
+    "motion": "Has moving parts", "waived": "A rule is waived for this icon",
 }
 
 
@@ -390,6 +391,17 @@ def without_crumbs(p):
     return to_path(keep)
 
 
+def without_pinholes(p):
+    """Fill holes under 1 px²: too small to see, left where a modifier glyph meets the icon."""
+    cs = contours(p)
+    sign = math.copysign(1, max(map(signed_area, cs), key=abs)) if cs else 1
+    for c in cs:
+        if signed_area(c) * sign < 0 and abs(signed_area(c)) / 2 < 1:
+            p = op(p, to_path([c]), PathOp.UNION)
+            APPLIED.add("crumbs")
+    return p
+
+
 def modifier_cut(base, cut, solid):
     """Cut a modifier badge's space out of a base icon without leaving damage (see RULES.md, Modifiers)."""
     cs = contours(base)
@@ -449,7 +461,8 @@ def modifier_cut(base, cut, solid):
             keep.append(c)
     opened = op(to_path(keep), Path(), PathOp.UNION)
     near = op(cut, stroked(cut, 6), PathOp.UNION)
-    return op(op(out, near, PathOp.DIFFERENCE), op(opened, near, PathOp.INTERSECTION), PathOp.UNION)
+    out = op(op(out, near, PathOp.DIFFERENCE), op(opened, near, PathOp.INTERSECTION), PathOp.UNION)
+    return without_pinholes(out)
 
 
 def hand_file(name, variant):
@@ -502,6 +515,18 @@ def source_rules(root):
     return found
 
 
+# Rules that can be waived for one icon in waivers.json: key -> the text that identifies its message
+WAIVABLE = {"gap": "a gap or cut-out is under 1 px", "small": "minimum is 2 x 2", "bounds": "outside",
+            "nick": "only nicks the base", "filled-cutout": "cut-out was filled in"}
+
+
+def waived(name, message, waivers):
+    """The reason this message is waived for this icon, or None."""
+    for key, reason in waivers.get(name, {}).items():
+        if WAIVABLE[key] in message:
+            return reason
+
+
 def uses(name, drawn):
     """[[icon, role]] this icon is built from. Roles: base, badge (small modifier glyph), cutout."""
     if name in drawn:
@@ -549,6 +574,7 @@ def main():
     dist = ROOT / "dist"
     (dist / "svg").mkdir(parents=True, exist_ok=True)
     out, defs, meta, anim, failed = {v: {} for v in VARIANTS}, [], [], {}, 0
+    waivers = json.loads((ROOT / "waivers.json").read_text()) if (ROOT / "waivers.json").exists() else {}
     # Pictogrammers' own record for each MDI name: categories ("tags"), search aliases, author, version added
     mdi_meta = ROOT / "vendor" / "mdi" / "meta.json"
     upstream = {i["name"]: i for i in json.loads(mdi_meta.read_text())} if mdi_meta.exists() else {}
@@ -565,6 +591,8 @@ def main():
                 p = area(root, {}, ids)
                 if not hand:
                     p = without_crumbs(p)
+                if 'id="mod-' in src:  # where a modifier glyph meets the icon it can close off a pinhole
+                    p = without_pinholes(p)
                 errs += lint_shape(p, bool(root.get("data-overflow")) or not hand)
                 d = to_d(p)
                 if hand and (sc := sharp_corners(p)):
@@ -575,7 +603,12 @@ def main():
             (dist / "svg" / f"{name}.{v}.svg").write_text(src)
             if name not in proposed:  # proposals are shown in the preview but are not part of the shipped set
                 out[v][name] = d
-            notes += [f"{v}: {w}" for w in WARNINGS]
+            for msg in errs + WARNINGS:  # a waived rule becomes a note and no longer fails the build
+                if why := waived(name, msg, waivers):
+                    notes.append(f"waived {v}: {msg}. {why}")
+                    rules.add("waived")
+            errs = [e for e in errs if not waived(name, e, waivers)]
+            notes += [f"{v}: {w}" for w in WARNINGS if not waived(name, w, waivers)]
             WARNINGS.clear()
             rules |= source_rules(root) | APPLIED
             APPLIED.clear()
@@ -612,7 +645,7 @@ def main():
         if name in drawn and "data-anim" in source(name, "filled"):
             # the preview animates the authoring SVG, because the flattened path has no separate parts to move
             meta[-1]["a"] = ET.fromstring(source(name, "filled")).get("data-motion", "")
-            anim[name] = {v: source(name, v).replace('id="c"', f'id="{name}-{v}-c"').replace("url(#c)", f"url(#{name}-{v}-c)") for v in VARIANTS}
+            anim[name] = {v: re.sub(r'(id="|url\(#)', rf"\g<1>{name}-{v}-", source(name, v)) for v in VARIANTS}
     for v in VARIANTS:
         (dist / f"{v}.json").write_text(json.dumps(out[v], indent=0))
     (dist / "outline-aliases.json").write_text(json.dumps(aliases, indent=0))

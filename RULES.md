@@ -42,7 +42,7 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 - Built from solid masses. Detail is cut out as negative space, not drawn as extra lines. (by eye)
 - A cut-out is never smaller than 2 x 2 px. (lint)
 - Avoid large blobs and avoid slivers thinner than 2 px. (by eye)
-- A large, plain, rounded mass may carry one glint: a short 2 px arc cut out near its edge, following the curve (the bulb, the water drop, the shield). It never goes bottom right, where a badge would cut it away, and it is left out when it would crowd other detail, as in `shield-check`. The stroked variant draws the arc as a line only where it keeps a clear gap to the outline; the stroked water drop is too small for one. (by eye)
+- A large, plain, rounded mass may carry one glint: a short 2 px dash cut out near its edge, about 3 px long and angled to follow the curve (the bulb, the water drop, the shield). It goes bottom left by default (the water drop, the shield). It goes top right only when bottom left would run into the off slash (the bulb). It never goes bottom right, where a badge would cut it away, and it is left out when it would crowd other detail, as in `shield-check`. The stroked variant draws the arc as a line only where it keeps a clear gap to the outline; the stroked water drop is too small for one. (by eye)
 
 ## Stroked variant
 
@@ -75,6 +75,7 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 - A cut never takes under 1 px² from any part of the icon. This is judged per piece: where the cut would only graze a part (the edge of the head in `account-lock`), that part is left whole, and the cut still applies where it takes a real bite. (build)
 - A badge cut must not nick the base. If it removes between 1 and 4 px² of the base, the icon is flagged and needs a hand-drawn version. (build warns)
 - A piece that a cut splits off or whittles down to under 8 px² (a 2 px line shorter than 4 px) is too small to read and is removed. Parts the cut never touched are kept, however small. (build)
+- A pinhole under 1 px² that a cut leaves behind is filled in. (build)
 - A suffix is only a modifier when it means one. `toggle-switch-off` is a state, so it is drawn by hand. (by eye)
 - The badge keeps its corner. When it would cover the part that identifies the icon (the handle of the magnifier in `magnify-plus`), that part is moved or mirrored in a hand-drawn version so both stay visible. (by eye)
 - When a line of the icon runs parallel to the off slash and would vanish into it (the arrowhead in `download-off`), the icon is redrawn by hand with that part clear of the slash. (by eye)
@@ -93,6 +94,12 @@ The rules this icon set follows today. Each rule says how it is enforced: **lint
 - Motion stops when the viewer has asked for reduced motion. (build)
 - The static icon must be complete on its own; motion never carries the meaning alone. (by eye)
 - A part that only exists while the icon moves (the charge level in `battery`) is marked `display="none"`, so the static icon and the built path never show it. (build)
+
+## Waivers
+
+- A rule can be knowingly switched off for one icon after it has been reviewed. The waiver goes in `waivers.json` as icon, rule and reason. A waived rule no longer fails the build; it shows on the icon as a note, in the preview's Issues view under "Waived", and as the filter "A rule is waived for this icon". (build)
+- Rules that can be waived: `gap` (a gap or cut-out under 1 px), `small` (a cut-out or fragment under 2 x 2 px), `bounds` (paint outside the live area), `nick` (a badge cut that only nicks the base), `filled-cutout` (a cut-out lost to a badge).
+- Current waivers: `flash-off`, `star-off`, `lightbulb-off` and `lock-off` for `gap`, where the off slash leaves a narrow pocket; `map-marker-minus` for `nick`.
 
 ## Pictogrammers metadata
 

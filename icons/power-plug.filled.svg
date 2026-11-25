@@ -1,7 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait">
   <rect x="8" y="2" width="2" height="6" rx="1"/>
   <rect x="14" y="2" width="2" height="6" rx="1"/>
-  <rect x="6" y="7" width="12" height="7" rx="2"/>
-  <polygon points="8,13 16,13 14,17 10,17"/>
-  <rect x="10" y="16" width="4" height="6" rx="2"/>
+  <polygon points="7,8 17,8 17,13 13,17 13,21 11,21 11,17 7,13" stroke="currentColor" stroke-width="2"/>
 </svg>

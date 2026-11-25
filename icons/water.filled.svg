@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke-linejoin="round" stroke-linecap="round" data-keyline="portrait">
-  <mask id="c"><rect width="24" height="24" fill="#fff"/><path d="M9 15A3 3 0 0 0 12 18" fill="none" stroke="#000" stroke-width="2"/></mask>
+  <mask id="c"><rect width="24" height="24" fill="#fff"/><path d="M9 17L10 18" fill="none" stroke="#000" stroke-width="2"/></mask>
   <g mask="url(#c)">
     <path d="M12 4L16 12A5 5 0 1 1 8 12Z" stroke="currentColor" stroke-width="2"/>
   </g>
