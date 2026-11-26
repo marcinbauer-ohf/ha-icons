@@ -362,6 +362,15 @@ def lint_source(root, variant):
     return errs
 
 
+def where(pieces):
+    """' at (x,y) …': the centres of up to four contours, so the preview can mark them on the icon."""
+    pts = []
+    for c in pieces:
+        xs, ys = [q[0] for s in c for q in s[1:]], [q[1] for s in c for q in s[1:]]
+        pts.append(f"({(min(xs) + max(xs)) / 2:.1f},{(min(ys) + max(ys)) / 2:.1f})")
+    return f" at {' '.join(pts[:4])}" if pts else ""
+
+
 def lint_shape(p, overflow):
     errs = []
     lo, hi = (1, 23) if overflow else (2, 22)
@@ -370,11 +379,17 @@ def lint_shape(p, overflow):
         errs.append(f"paint {[round(v, 2) for v in b]} outside {lo}..{hi}")
     fat = Path(p)
     fat.stroke(0.96, LineCap.ROUND_CAP, LineJoin.ROUND_JOIN, 4)
-    if len(contours(op(p, fat, PathOp.UNION))) != len(contours(p)):
-        errs.append("a gap or cut-out is under 1 px")
+    n = len(contours(p))
+    grown = op(p, fat, PathOp.UNION)
+    if len(contours(grown)) != n:
+        # where: grow and shrink back (a closing); of what that adds, the pieces that join parts or close a cut-out
+        added = op(op(grown, stroked(grown, 0.96), PathOp.DIFFERENCE), p, PathOp.DIFFERENCE)
+        errs.append("a gap or cut-out is under 1 px" + where([c for c in contours(added) if len(contours(op(p, to_path([c]), PathOp.UNION))) != n]))
     thin = op(p, stroked(p, 0.96), PathOp.DIFFERENCE)  # shave 0.48 px off every edge
-    if len(contours(thin)) != len(contours(p)):  # something split, vanished, or a cut-out broke through
-        errs.append("a wall or part is under 1 px wide")
+    if len(contours(thin)) != n:  # something split, vanished, or a cut-out broke through
+        # where: shrink and grow back (an opening); of what that loses, the pieces whose loss splits or opens the shape
+        lost = op(p, op(thin, stroked(thin, 0.96), PathOp.UNION), PathOp.DIFFERENCE)
+        errs.append("a wall or part is under 1 px wide" + where([c for c in contours(lost) if len(contours(op(p, to_path([c]), PathOp.DIFFERENCE))) != n]))
     for hole, w, h, x, y in small_parts(p):
         errs.append(f"{'cut-out' if hole else 'fragment'} at ({x:.1f},{y:.1f}) is {w:.1f} x {h:.1f}, minimum is 2 x 2")
     return errs
@@ -449,7 +464,7 @@ def modifier_cut(base, cut, solid):
                 APPLIED.add("hole-trimmed")
             else:
                 base = op(base, hole, PathOp.UNION)
-                WARNINGS.append("a cut-out was filled in to make room for the badge; check the icon still reads")
+                WARNINGS.append("a cut-out was filled in to make room for the badge" + where([c]) + "; check the icon still reads")
                 APPLIED.add("hole-filled")
     islands = [box(c) for c in contours(base) if signed_area(c) * outer > 0]
     # What the cut would remove, piece by piece. A piece under 1 px² is a nick on some part of the icon
@@ -463,7 +478,7 @@ def modifier_cut(base, cut, solid):
         return base
     if taken < 4:
         APPLIED.add("nick")
-        WARNINGS.append(f"modifier cut only nicks the base ({taken:.1f} px²); draw this icon by hand")
+        WARNINGS.append(f"modifier cut only nicks the base ({taken:.1f} px²){where([c for a, c in pieces if a >= 1])}; draw this icon by hand")
     out = op(op(base, cut, PathOp.DIFFERENCE), to_path(spared), PathOp.UNION) if spared else op(base, cut, PathOp.DIFFERENCE)
     # A piece the cut has split off or whittled down to under 8 px² (a 2 px line shorter than 4 px) is too
     # small to read and just floats there: remove it. Parts of the icon the cut never touched are kept.

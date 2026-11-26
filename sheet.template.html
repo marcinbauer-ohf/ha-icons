@@ -292,7 +292,14 @@ button.relchip:hover{border-color:var(--muted)}
 .issues h2 small{color:var(--muted);font-weight:500}
 .issues .sev{font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .issues .sev.err{border-color:var(--danger);color:var(--danger)}
-.issues .fam{margin-top:12px;width:fit-content}
+.issues .fam{margin-top:16px;width:fit-content}
+.doc .legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin:16px 0 0}
+.doc .legend li{display:flex;align-items:center;gap:8px;padding:0;border:0;cursor:help}
+.legend i{display:block;flex:none;width:12px;height:12px;border-radius:50%;border:2px solid var(--c)}
+.legend small{color:var(--muted)}
+.mk{position:relative;display:block}
+svg.marks{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none;stroke:var(--danger);stroke-width:2px;filter:drop-shadow(0 0 1px var(--surface))}
+svg.marks *{vector-effect:non-scaling-stroke}
 .issues .notes li{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted)}
 .issues .notes{margin-top:12px}
 .relchip[aria-current=true]{box-shadow:0 0 0 2px var(--accent);border-color:transparent}
@@ -502,10 +509,22 @@ function ordered() {
   return S.group === 'az' ? list : list.sort((a, b) => a.f.localeCompare(b.f) || (b.n === b.f) - (a.n === a.f) || a.n.localeCompare(b.n))
 }
 // one icon in a grid: Browse and Issues draw the same cell; v picks the variant, tip adds to the tooltip
-const iconCell = (i, px, v = S.variant, tip = '') => `<button class="cell" data-n="${i.n}" aria-current="${i.n === S.sel}" title="${esc(i.n + (tip ? ' · ' + tip : ''))}">
+const iconCell = (i, px, v = S.variant, tip = '', mk = '') => `<button class="cell" data-n="${i.n}" aria-current="${i.n === S.sel}" title="${esc(i.n + (tip ? ' · ' + tip : ''))}">
     ${i.e ? '<i class="flag err"></i>' : ''}${S.pins.includes(i.n) ? '<i class="flag pin" title="In compare"></i>' : ''}${stOf(i.n) ? `<i class="flag st" style="--st:${STATUS[stOf(i.n)][1]}" title="${STATUS[stOf(i.n)][0]}"></i>` : ''}
-    <span class="pair">${S.show === 'mdi' ? use(i.n, 'mdi', px, 'old') : ''}${S.animate ? moving(i.n, v, px) : use(i.n, v, px)}</span>
+    <span class="pair">${S.show === 'mdi' ? use(i.n, 'mdi', px, 'old') : ''}${mk ? `<span class="mk">${use(i.n, v, px)}${mk}</span>` : S.animate ? moving(i.n, v, px) : use(i.n, v, px)}</span>
     <span class="nm">${i.n}</span></button>`
+// where lint messages point, drawn over the icon: "at (x,y) is w x h" and "paint [x0, y0, x1, y1]" are boxes, any other "(x,y)" a spot
+function marks(msgs) {
+  const out = []
+  for (const t of msgs) {
+    let m, c = `style="stroke:${KINDS[kindAny(t)]?.[4] || 'var(--danger)'}"`
+    if ((m = t.match(/at \((-?[\d.]+),(-?[\d.]+)\) is ([\d.]+) x ([\d.]+)/))) out.push(`<rect x="${m[1] - .5}" y="${m[2] - .5}" width="${+m[3] + 1}" height="${+m[4] + 1}" rx=".5" ${c}/>`)
+    else if ((m = t.match(/paint \[(-?[\d.]+), (-?[\d.]+), (-?[\d.]+), (-?[\d.]+)\]/))) out.push(`<rect x="${m[1]}" y="${m[2]}" width="${m[3] - m[1]}" height="${m[4] - m[2]}" stroke-dasharray="3 2" ${c}/>`)
+    else for (const [, x, y] of t.matchAll(/\((-?[\d.]+),(-?[\d.]+)\)/g)) out.push(`<circle cx="${x}" cy="${y}" r="1.6" ${c}/>`)
+  }
+  return out.length ? `<svg class="marks" viewBox="0 0 24 24" aria-hidden="true">${out.join('')}</svg>` : ''
+}
+const inVariant = (t, v) => t.split(':')[0].includes(v)
 function renderBrowse() {
   const list = ordered(), px = +S.size
   const chips = Object.keys(FILTERS).map(k =>
@@ -687,35 +706,39 @@ function renderMotion() {
       <b>${i.n}</b><small>${esc(i.a)}</small></button>`).join('')}</div>`
 }
 
-// what counts as a problem to fix, in the order the worklist shows it; everything else in the lint notes is a note
+// what counts as a problem to fix, in the order the worklist shows it, with the colour that marks it on the icon; everything else in the lint notes is a note
 const KINDS = [
-  [/^ERROR \w+: a gap or cut-out is under 1 px/, 'err', 'Gap or cut-out under 1 px', 'Two parts, or the two sides of a cut-out, sit closer than 1 px. Fails the build.'],
-  [/^ERROR \w+: (cut-out|fragment) at/, 'err', 'Cut-out or fragment under 2 x 2 px', 'Too small to render cleanly at 24 px. Fails the build.'],
-  [/^ERROR \w+: paint/, 'err', 'Paint outside the live area', 'Reaches past the padding without an overflow note. Fails the build.'],
-  [/^ERROR/, 'err', 'Other lint errors', 'Fails the build.'],
-  [/only nicks the base/, 'warn', 'Badge cut only nicks the base', 'The cut takes a sliver of the icon. Needs a hand-drawn version.'],
-  [/cut-out was filled in/, 'warn', 'Cut-out lost to a badge', 'Less than half of a cut-out would survive next to the badge, so it was filled in. Check the icon still reads.'],
-  [/sharp outer corner/, 'warn', 'Sharp outer corner', 'A convex corner on the silhouette is not rounded.'],
+  [/^ERROR \w+: a gap or cut-out is under 1 px/, 'err', 'Gap or cut-out under 1 px', 'Two parts, or the two sides of a cut-out, sit closer than 1 px. Fails the build.', '#e5484d'],
+  [/^ERROR \w+: (cut-out|fragment) at/, 'err', 'Cut-out or fragment under 2 x 2 px', 'Too small to render cleanly at 24 px. Fails the build.', '#d6409f'],
+  [/^ERROR \w+: paint/, 'err', 'Paint outside the live area', 'Reaches past the padding without an overflow note. Fails the build.', '#8e4ec6'],
+  [/^ERROR/, 'err', 'Other lint errors', 'Fails the build.', '#b3261e'],
+  [/only nicks the base/, 'warn', 'Badge cut only nicks the base', 'The cut takes a sliver of the icon. Needs a hand-drawn version.', '#f76b15'],
+  [/cut-out was filled in/, 'warn', 'Cut-out lost to a badge', 'Less than half of a cut-out would survive next to the badge, so it was filled in. Check the icon still reads.', '#0090ff'],
+  [/sharp outer corner/, 'warn', 'Sharp outer corner', 'A convex corner on the silhouette is not rounded.', '#12a594'],
 ]
 const kindOf = t => KINDS.findIndex(k => k[0].test(t))
 const isWaived = t => t.startsWith('waived ')
 const isProblem = t => !isWaived(t) && kindOf(t) >= 0
 const problemIcons = () => ICONS.filter(i => i.t.some(isProblem))
+// a waived message keeps its kind: "waived filled: a gap…" is the gap error, let through
+const kindAny = t => { const k = kindOf(t); return k >= 0 || !isWaived(t) ? k : kindOf('ERROR ' + t.slice(7)) }
+const BIG = 96  // icon size in the Issues view, large enough to see the marks
+// one cell per icon: every flagged spot on it, coloured by kind, in the variant you are looking at when it has any
+const issueGrid = (list, pick) => `<div class="fam" style="--cell:${BIG + 56}px">${list.map(i => {
+  const msgs = i.t.filter(pick), v = msgs.some(t => inVariant(t, S.variant)) ? S.variant : S.variant === 'filled' ? 'stroked' : 'filled'
+  const here = msgs.filter(t => inVariant(t, v))
+  return iconCell(i, BIG, v, here.map(t => t.replace(/^(ERROR |waived )?\w+: /, '')).join('\n'), marks(here))
+}).join('')}</div>`
 function renderIssues() {
-  const groups = KINDS.map(() => new Map())
-  for (const i of ICONS) for (const t of i.t) {
-    const k = kindOf(t)
-    if (k >= 0) (groups[k].get(i.n) || groups[k].set(i.n, new Set()).get(i.n)).add(/filled/.test(t.split(':')[0]) ? 'filled' : 'stroked')
-  }
-  const total = problemIcons().length
-  const waivedIcons = ICONS.filter(i => i.t.some(isWaived))
-  const waivedHtml = !waivedIcons.length ? '' : `<section><h2><span class="sev">Waived</span>Rules knowingly not applied<small class="num">${waivedIcons.length}</small></h2>
-    <p>Listed in <code>waivers.json</code>. These do not fail the build. Hover an icon for the reason.</p><div class="fam">${waivedIcons.map(i =>
-      iconCell(i, 24, S.variant, i.t.filter(isWaived).map(t => t.replace(/^waived \w+: /, '')).filter((t, k, a) => a.indexOf(t) === k).join(' '))).join('')}</div></section>`
-  $('main').innerHTML = !total && !waivedHtml ? `<div class="empty"><strong>Nothing to fix.</strong>Every icon passes lint in both variants and no badge cut is flagged.</div>` :
-    `<div class="doc issues"><p>${total || 'No'} icon${total === 1 ? '' : 's'} need attention. Errors fail the build; warnings are icons the build could not derive cleanly.</p>${
-      KINDS.map(([, sev, title, why], k) => !groups[k].size ? '' : `<section><h2><span class="sev ${sev}">${sev === 'err' ? 'Error' : 'Warning'}</span>${title}<small class="num">${groups[k].size}</small></h2><p>${why}</p>
-        <div class="fam">${[...groups[k]].map(([n, vs]) => iconCell(byName[n], 24, vs.has(S.variant) ? S.variant : [...vs][0], [...vs].join(' + '))).join('')}</div></section>`).join('')}${waivedHtml}</div>`
+  const probs = problemIcons(), waivedIcons = ICONS.filter(i => i.t.some(isWaived))
+  const count = k => probs.filter(i => i.t.some(t => isProblem(t) && kindOf(t) === k)).length
+  const legend = `<ul class="legend">${KINDS.map(([, sev, title, why, col], k) => !count(k) ? '' :
+    `<li title="${esc(why)}"><i style="--c:${col}"></i>${title}<span class="sev ${sev}">${sev === 'err' ? 'Error' : 'Warning'}</span><small class="num">${count(k)}</small></li>`).join('')}</ul>`
+  $('main').innerHTML = !probs.length && !waivedIcons.length ? `<div class="empty"><strong>Nothing to fix.</strong>Every icon passes lint in both variants and no badge cut is flagged.</div>` :
+    `<div class="doc issues"><p>${probs.length || 'No'} icon${probs.length === 1 ? '' : 's'} need attention. Errors fail the build; warnings are icons the build could not derive cleanly. Hover a kind for what it means, or an icon for its problems.</p>
+      ${legend}${probs.length ? issueGrid(probs, isProblem) : ''}
+      ${waivedIcons.length ? `<section><h2><span class="sev">Waived</span>Rules knowingly not applied<small class="num">${waivedIcons.length}</small></h2>
+        <p>Listed in <code>waivers.json</code>. These do not fail the build. Hover an icon for the reason.</p>${issueGrid(waivedIcons, isWaived)}</section>` : ''}</div>`
 }
 
 function renderRules() {
