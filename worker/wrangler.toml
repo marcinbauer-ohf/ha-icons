@@ -1,0 +1,7 @@
+name = "ha-icons-auth"
+main = "index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# the GitHub App's client ID (public); the secret goes in with: npx wrangler secret put CLIENT_SECRET
+CLIENT_ID = ""

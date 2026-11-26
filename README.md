@@ -4,6 +4,7 @@ A redrawn icon set for Home Assistant: every Material Design Icons concept, rebu
 
 - `icons/` holds the hand-drawn authoring SVGs. `template.svg` has the drawing guides.
 - `build.py` lints them, derives modifier variants (plus, minus, check, alert, lock, off), and flattens everything to single paths.
+- `worker/` signs reviewers in with GitHub so they can comment and set an icon's status from the preview. Setup is in [worker/README.md](worker/README.md).
 
 ```bash
 uv run build.py

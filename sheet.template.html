@@ -45,7 +45,7 @@ h1,h2,h3,p,dl,dd{margin:0}
 .bar h1{font-size:15px;font-weight:650;letter-spacing:-.01em}
 .bar .meta{color:var(--muted)}
 .bar .grow{flex:1}
-.search{width:200px;min-width:110px;flex-shrink:1;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);caret-color:var(--accent)}
+.search{width:420px;min-width:160px;flex-shrink:1;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);caret-color:var(--accent)}
 .search::placeholder{color:var(--muted)}
 .seg{display:flex;padding:2px;border-radius:8px;background:var(--line)}
 .seg button{padding:4px 10px;border-radius:6px;color:var(--muted);transition:background .15s,color .15s}
@@ -66,6 +66,8 @@ h1,h2,h3,p,dl,dd{margin:0}
 .catsel+.catsel{margin-left:0}
 .filters:has(+.filters){margin-bottom:8px}
 .filters.opts{gap:4px 16px}
+.fbar{position:sticky;top:-16px;z-index:2;margin:-16px -24px 16px;padding:16px 24px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.fbar .filters:last-child{margin-bottom:0}
 .opt{display:flex;align-items:center;gap:8px;color:var(--muted);white-space:nowrap}
 .opts .switch{margin-left:auto}
 .catsel{font:inherit;color:var(--ink);margin-left:auto;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);max-width:220px}
@@ -96,6 +98,28 @@ kbd{font:inherit;padding:0 5px;border:1px solid var(--line);border-radius:4px;ba
 .cell .flag{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%}
 .cell .flag.err{background:var(--danger)}
 .cell .flag.pin{left:6px;right:auto;background:var(--accent)}
+.cell .flag.st{right:16px;background:var(--st)}
+.review{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-8px 0 16px;color:var(--muted)}
+.review .st{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+.review .st::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--st,var(--line))}
+a.tool{text-decoration:none;color:var(--ink)}
+a.tool.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+a.tool.primary:hover{filter:brightness(1.1)}
+.review .tool{margin-left:auto}
+button.tool.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.review select{font:inherit;color:var(--ink);padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.review .err,.thread .err{color:var(--danger)}
+.thread{display:grid;gap:12px}
+.comment{padding:10px 12px;border-radius:10px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.comment header{display:flex;align-items:center;gap:8px;color:var(--muted);margin-bottom:6px}
+.comment header img{width:20px;height:20px;border-radius:50%}
+.comment header b{color:var(--ink);font-weight:600}
+.comment .body{overflow-wrap:anywhere}
+.comment .body>*{margin:0 0 6px}.comment .body>:last-child{margin-bottom:0}
+.comment .body img{max-width:100%}
+.composer{display:grid;gap:8px;margin-top:16px}
+.composer textarea{font:inherit;color:var(--ink);min-height:72px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);resize:vertical}
+.composer div{display:flex;align-items:center;gap:8px;justify-content:space-between;color:var(--muted)}
 .empty{padding:48px 0;color:var(--muted);max-width:44ch}
 .empty strong{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
 
@@ -145,11 +169,11 @@ kbd{font:inherit;padding:0 5px;border:1px solid var(--line);border-radius:4px;ba
 .trio .stage svg{width:56px;height:56px}
 .trio .none{font-size:11px;opacity:.6}
 
-.ins[data-tab=preview] [data-t]:not([data-t=preview]),.ins[data-tab=details] [data-t]:not([data-t=details]),.ins[data-tab=issues] [data-t]:not([data-t=issues]){display:none}
+.ins[data-tab=preview] [data-t]:not([data-t=preview]),.ins[data-tab=details] [data-t]:not([data-t=details]),.ins[data-tab=issues] [data-t]:not([data-t=issues]),.ins[data-tab=review] [data-t]:not([data-t=review]){display:none}
 .tabs{height:36px;margin:0 0 20px;border-bottom:1px solid var(--line)}
 .tabs b:not(:empty){background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
 .ins section{margin-top:32px}
-.ins .tabs+section,.ins[data-tab=details] section[data-t=details]:first-of-type,.ins[data-tab=issues] section[data-t=issues]:first-of-type{margin-top:0}
+.ins .tabs+section,.ins[data-tab=details] section[data-t=details]:first-of-type,.ins[data-tab=issues] section[data-t=issues]:first-of-type,.ins[data-tab=review] section[data-t=review]:first-of-type{margin-top:0}
 .ins h3{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
 .strips{display:grid;gap:8px}
 .strip{display:flex;align-items:flex-end;justify-content:space-around;padding:20px 16px 12px;border-radius:14px;
@@ -268,7 +292,7 @@ button.relchip:hover{border-color:var(--muted)}
 .issues h2 small{color:var(--muted);font-weight:500}
 .issues .sev{font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .issues .sev.err{border-color:var(--danger);color:var(--danger)}
-.issues .rel{margin-top:12px}
+.issues .fam{margin-top:12px;width:fit-content}
 .issues .notes li{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted)}
 .issues .notes{margin-top:12px}
 .relchip[aria-current=true]{box-shadow:0 0 0 2px var(--accent);border-color:transparent}
@@ -279,7 +303,10 @@ button.relchip:hover{border-color:var(--muted)}
 .rulelist small{color:var(--muted)}
 .link{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 .chip.on{background:var(--accent);color:#fff;display:flex;align-items:center;gap:6px}
-.doc{max-width:72ch;font-size:14px;line-height:1.55;padding-bottom:48px}
+.doc{max-width:72ch;}
+.doc.issues{max-width:none}
+.doc.issues>p,.issues section>p{max-width:72ch}
+.doc{font-size:14px;line-height:1.55;padding-bottom:48px}
 .doc h1{font-size:24px;font-weight:650;letter-spacing:-.02em;margin-bottom:8px;text-wrap:balance}
 .doc h2{font-size:16px;font-weight:650;margin:40px 0 8px}
 .doc p{color:var(--muted);margin-bottom:8px}
@@ -307,8 +334,6 @@ button.relchip:hover{border-color:var(--muted)}
   </svg></h1>
   <nav class="seg nav" data-key="mode" aria-label="Views"><button data-v="browse">Browse</button><button data-v="compare">Compare<b id="pincount"></b></button><button data-v="dash">Dashboard</button><button data-v="motion">Motion</button><button data-v="issues">Issues<b id="issuecount"></b></button><button data-v="rules">Rules</button></nav>
   <input class="search" id="q" type="search" placeholder="Search icons" aria-label="Search icons">
-  <div class="seg" data-key="variant" role="group" aria-label="Variant"><button data-v="filled">Filled</button><button data-v="stroked">Stroked</button></div>
-  <div class="seg" data-key="theme" role="group" aria-label="App theme"><button data-v="light">Light</button><button data-v="dark">Dark</button></div>
 </header>
 
 <div class="work">
@@ -326,8 +351,25 @@ const moving = (n, v, px) => !ANIM[n] || v === 'mdi' ? use(n, v, px) :
   ANIM[n][v].replaceAll(`${n}-${v}-`, `${n}-${v}-${++uid}-`).replace('<svg ', `<svg class="anim" width="${px}" height="${px}" aria-hidden="true" `)
 const byName = Object.fromEntries(ICONS.map(i => [i.n, i]))
 const S = {sel: ICONS[0].n, mode: 'browse', variant: 'filled', show: 'new', size: '24', theme: 'light',
-  filter: 'all', q: '', uses: '', rule: '', cat: '', ha: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
+  filter: 'all', q: '', uses: '', rule: '', cat: '', ha: '', st: '', animate: false, group: 'family', tab: 'preview', pins: [], stageV: 'filled', stage: 'light', rules: false, ghost: false}
 try { Object.assign(S, JSON.parse(localStorage.getItem('ha-icons-sheet') || '{}')) } catch {}
+// Sign-in (see worker/README.md). Empty until the worker is deployed; the review then falls back to links to GitHub.
+const AUTH = {client: '', worker: ''}
+let token = '', ME = null, authError = ''
+try { token = localStorage.getItem('ha-icons-gh') || '' } catch {}
+{ // the worker sends people back with #gh_token=…&state=<nonce>.<page>.<icon>
+  const h = new URLSearchParams(location.hash.slice(1))
+  if (h.has('state')) {
+    const [nonce, , icon] = h.get('state').split('.')
+    let want = ''
+    try { want = sessionStorage.getItem('ha-icons-nonce'); sessionStorage.removeItem('ha-icons-nonce') } catch {}
+    if (!nonce || nonce !== want) authError = 'Sign-in could not be verified. Try again.'
+    else if (h.get('gh_token')) { token = h.get('gh_token'); try { localStorage.setItem('ha-icons-gh', token) } catch {} }
+    else authError = h.get('gh_error') || 'Sign-in failed.'
+    history.replaceState(null, '', location.pathname + location.search + '#' + (icon || ''))
+  }
+}
+if (byName[decodeURIComponent(location.hash.slice(1))]) S.sel = decodeURIComponent(location.hash.slice(1))  // #name links to one icon
 if (!byName[S.sel]) S.sel = ICONS[0].n
 S.pins = S.pins.filter(n => byName[n])
 
@@ -336,10 +378,12 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&g
 const use = (n, v, px, cls = '') => v === 'mdi' && !byName[n].m ? '' :
   `<svg class="${cls}" width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true"><use href="#${n}-${v}"/></svg>`
 const LABEL = {mdi: 'MDI', filled: 'Filled', stroked: 'Stroked'}
-const FILTERS = {all: () => true, drawn: i => i.d, derived: i => !i.d, animated: i => i.a, proposals: i => i.p, issues: i => i.e}
+const FILTERS = {all: () => true, drawn: i => i.d, derived: i => !i.d, animated: i => i.a, proposals: i => i.p, issues: i => i.t.some(isProblem)}
 const seg = (key, label, opts) => `<span class="opt">${label}<span class="seg" data-key="${key}" role="group" aria-label="${label}">${
   opts.map(([v, t]) => `<button data-v="${v}">${t}</button>`).join('')}</span></span>`
 const MDIOPT = seg('show', 'Compare with', [['new', 'Nothing'], ['mdi', 'MDI']])
+// variant and app theme sit in every view's options row
+const LOOK = seg('variant', 'Variant', [['filled', 'Filled'], ['stroked', 'Stroked']]) + seg('theme', 'Theme', [['light', 'Light'], ['dark', 'Dark']])
 const NOCAT = 'Uncategorised'
 const catsOf = i => i.g ? (i.g.categories.length ? i.g.categories : [NOCAT]) : []
 const CATS = [...new Set(ICONS.flatMap(catsOf))].sort((a, b) => (a === NOCAT) - (b === NOCAT) || a.localeCompare(b))
@@ -353,7 +397,96 @@ const inHa = (i, d) => haTags(i).some(t => haDomain(t) === d)
 // search matches the name, Pictogrammers' aliases ("notifications" finds bell) and Home Assistant tags ("vacuum.start" finds play)
 const matches = (i, q) => !q || i.n.includes(q) || (i.g && i.g.aliases.some(a => a.includes(q))) || haTags(i).some(t => t.includes(q))
 const visible = () => ICONS.filter(i => FILTERS[S.filter](i) && matches(i, S.q.trim().toLowerCase()) && (!S.cat || catsOf(i).includes(S.cat)) && (!S.ha || inHa(i, S.ha)) &&
-  (!S.uses || i.u.some(u => u[0] === S.uses)) && (!S.rule || i.r.includes(S.rule)))
+  (!S.uses || i.u.some(u => u[0] === S.uses)) && (!S.rule || i.r.includes(S.rule)) && (!S.st || stOf(i.n) === (S.st === '-' ? '' : S.st)))
+// Review: each icon's discussion is a GitHub issue titled with its name and labelled "icon"; its "status: …" label is the stage.
+// Read without signing in (60 requests an hour per visitor); everything is written on GitHub.
+const REPO = 'marcinbauer-ohf/ha-icons', SITE = 'https://marcinbauer-ohf.github.io/ha-icons/'
+const STATUS = {'': ['Not reviewed', ''], draft: ['Draft', '#8b8d94'], 'in progress': ['In progress', '#2b9af9'],
+  'needs changes': ['Needs changes', '#f76b15'], approved: ['Approved', '#2f9e44'], shipped: ['Shipped', '#8e5cf7']}
+let REVIEW = {}, reviewError = '', reviewedAt = 0, reviewNote = ''
+const COMMENTS = {}, DRAFT = {}  // issue number -> comments (or 'loading' / Error); icon -> unsent comment
+const stOf = n => REVIEW[n]?.status || ''
+// GitHub REST, signed in when there is a token (5000 requests an hour instead of 60); bodies come back as GitHub's sanitised HTML
+async function gh(path, method = 'GET', body) {
+  const r = await fetch('https://api.github.com' + path, {method, body: body && JSON.stringify(body),
+    headers: {Accept: 'application/vnd.github.html+json', ...(token ? {Authorization: 'Bearer ' + token} : {}), ...(body ? {'Content-Type': 'application/json'} : {})}})
+  if (r.status === 401 && token) { signOut(); throw Object.assign(new Error('Your sign-in expired. Sign in again.'), {status: 401}) }
+  if (!r.ok) throw Object.assign(new Error(r.status === 403 && !token ? 'GitHub rate limit reached, try again in a while' : `GitHub said ${r.status}`), {status: r.status})
+  return r.status === 204 ? null : r.json()
+}
+const issueOf = x => {
+  const st = x.labels.map(l => l.name).find(l => l.startsWith('status: '))?.slice(8) || ''
+  return {status: st in STATUS ? st : '', comments: x.comments, url: x.html_url, open: x.state === 'open', number: x.number}
+}
+function signIn() {
+  const nonce = crypto.randomUUID().replaceAll('-', '')
+  try { sessionStorage.setItem('ha-icons-nonce', nonce) } catch {}
+  const page = location.origin === 'http://localhost:8765' ? 1 : 0  // index into the worker's allowlist
+  location.href = 'https://github.com/login/oauth/authorize?' + new URLSearchParams({client_id: AUTH.client, redirect_uri: AUTH.worker + '/callback', state: `${nonce}.${page}.${S.sel}`})
+}
+function signOut() { token = ''; ME = null; try { localStorage.removeItem('ha-icons-gh') } catch {}; render('ins') }
+async function loadMe() { if (token) try { ME = await gh('/user'); render('ins') } catch {} }
+// the issue for an icon, opened on first use; GitHub drops the labels silently for people without triage access
+async function issueFor(n, status = 'draft') {
+  if (REVIEW[n]) return REVIEW[n]
+  const x = await gh(`/repos/${REPO}/issues`, 'POST', {title: n, labels: ['icon', 'status: ' + status],
+    body: `Review of **${n}**: ${SITE}#${n}\n\nStatus is the \`status: …\` label (draft, in progress, needs changes, approved, shipped).`})
+  if (!x.labels.some(l => l.name === 'icon')) reviewNote = 'GitHub opened the issue without its labels, so it will not show up here. Ask a maintainer for triage access.'
+  return REVIEW[n] = issueOf(x)
+}
+async function setStatus(n, st) {
+  reviewNote = ''
+  try {
+    const had = REVIEW[n]
+    const x = await issueFor(n, st || 'draft')
+    if (had) {
+      if (x.status) await gh(`/repos/${REPO}/issues/${x.number}/labels/${encodeURIComponent('status: ' + x.status)}`, 'DELETE').catch(e => { if (e.status !== 404) throw e })
+      if (st) await gh(`/repos/${REPO}/issues/${x.number}/labels`, 'POST', {labels: ['status: ' + st]})
+    }
+    x.status = st
+  } catch (e) { reviewNote = e.status === 403 || e.status === 404 ? 'You can comment, but changing the status needs triage access to the repo.' : e.message }
+  render()
+}
+async function loadComments(x) {
+  COMMENTS[x.number] = 'loading'
+  try { COMMENTS[x.number] = await gh(`/repos/${REPO}/issues/${x.number}/comments?per_page=100`) } catch (e) { COMMENTS[x.number] = e }
+  render('ins')
+}
+async function postComment(n) {
+  const text = (DRAFT[n] || '').trim()
+  if (!text) return
+  reviewNote = ''
+  try {
+    const x = await issueFor(n)
+    const c = await gh(`/repos/${REPO}/issues/${x.number}/comments`, 'POST', {body: text})
+    if (Array.isArray(COMMENTS[x.number])) COMMENTS[x.number].push(c); else COMMENTS[x.number] = [c]
+    x.comments++
+    DRAFT[n] = ''
+  } catch (e) { reviewNote = e.message }
+  render()
+}
+async function loadReviews() {
+  if (Date.now() - reviewedAt < 30000) return  // spare the rate limit when flicking between tabs
+  reviewedAt = Date.now()
+  try {
+    const got = {}
+    for (let page = 1; ; page++) {
+      const list = await gh(`/repos/${REPO}/issues?labels=icon&state=all&per_page=100&page=${page}`)
+      // oldest first, so the newest open issue for a name wins
+      for (const x of list.filter(x => !x.pull_request).reverse()) {
+        const n = x.title.trim(), have = got[n]
+        if (have && have.open && x.state !== 'open') continue
+        got[n] = issueOf(x)
+      }
+      if (list.length < 100) break
+    }
+    REVIEW = got; reviewError = ''
+    for (const k in COMMENTS) delete COMMENTS[k]  // refetched when the Review tab is next open
+  } catch (e) { reviewError = e.message }
+  render()
+}
+const newIssue = n => `https://github.com/${REPO}/issues/new?` + new URLSearchParams({title: n, labels: 'icon,status: draft',
+  body: `Review of **${n}**: ${SITE}#${n}\n\nStatus is the \`status: …\` label (draft, in progress, needs changes, approved, shipped).`})
 const usedIn = n => ICONS.filter(i => i.u.some(u => u[0] === n))
 const ROLE = {base: 'base', badge: 'small badge', cutout: 'cut-out', part: 'part'}
 const pretty = n => n.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase())
@@ -368,14 +501,16 @@ function ordered() {
   const list = visible().sort((a, b) => a.n.localeCompare(b.n))
   return S.group === 'az' ? list : list.sort((a, b) => a.f.localeCompare(b.f) || (b.n === b.f) - (a.n === a.f) || a.n.localeCompare(b.n))
 }
+// one icon in a grid: Browse and Issues draw the same cell; v picks the variant, tip adds to the tooltip
+const iconCell = (i, px, v = S.variant, tip = '') => `<button class="cell" data-n="${i.n}" aria-current="${i.n === S.sel}" title="${esc(i.n + (tip ? ' · ' + tip : ''))}">
+    ${i.e ? '<i class="flag err"></i>' : ''}${S.pins.includes(i.n) ? '<i class="flag pin" title="In compare"></i>' : ''}${stOf(i.n) ? `<i class="flag st" style="--st:${STATUS[stOf(i.n)][1]}" title="${STATUS[stOf(i.n)][0]}"></i>` : ''}
+    <span class="pair">${S.show === 'mdi' ? use(i.n, 'mdi', px, 'old') : ''}${S.animate ? moving(i.n, v, px) : use(i.n, v, px)}</span>
+    <span class="nm">${i.n}</span></button>`
 function renderBrowse() {
   const list = ordered(), px = +S.size
   const chips = Object.keys(FILTERS).map(k =>
     `<button class="chip" data-filter="${k}" aria-pressed="${S.filter === k}">${pretty(k)}<b>${ICONS.filter(FILTERS[k]).length}</b></button>`).join('')
-  const cell = i => `<button class="cell" data-n="${i.n}" aria-current="${i.n === S.sel}" title="${i.n}">
-    ${i.e ? '<i class="flag err"></i>' : ''}${S.pins.includes(i.n) ? '<i class="flag pin"></i>' : ''}
-    <span class="pair">${S.show === 'mdi' ? use(i.n, 'mdi', px, 'old') : ''}${S.animate ? moving(i.n, S.variant, px) : use(i.n, S.variant, px)}</span>
-    <span class="nm">${i.n}</span></button>`
+  const cell = i => iconCell(i, px)
   let body
   if (S.group === 'az') body = `<div class="grid">${list.map(cell).join('')}</div>`
   else {
@@ -391,16 +526,17 @@ function renderBrowse() {
   const x = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'
   const active = (S.uses ? `<button class="chip on" data-clearuses title="Clear this filter">Uses ${S.uses}${x}</button>` : '') +
     (S.rule ? `<button class="chip on" data-clearrule title="Clear this filter">Rule: ${RULE[S.rule]}${x}</button>` : '')
-  $('main').innerHTML = `<div class="filters">${chips}${active}<select class="catsel" id="ha" aria-label="Home Assistant domain"><option value="">All HA domains</option>${HADOMAINS.map(d =>
+  $('main').innerHTML = `<div class="fbar"><div class="filters">${chips}${active}<select class="catsel" id="st" aria-label="Review status"><option value="">All review states</option>${Object.entries(STATUS).map(([k, [t]]) =>
+      `<option value="${k || '-'}" ${(k || '-') === S.st ? 'selected' : ''}>${t} (${ICONS.filter(i => stOf(i.n) === k).length})</option>`).join('')}</select><select class="catsel" id="ha" aria-label="Home Assistant domain"><option value="">All HA domains</option>${HADOMAINS.map(d =>
       `<option ${d === S.ha ? 'selected' : ''} value="${d}">${d} (${ICONS.filter(i => inHa(i, d)).length})</option>`).join('')}</select><select class="catsel" id="cat" aria-label="Pictogrammers category"><option value="">All categories</option>${CATS.map(c =>
-      `<option value="${esc(c)}" ${c === S.cat ? 'selected' : ''}>${esc(c)} (${ICONS.filter(i => catsOf(i).includes(c)).length})</option>`).join('')}</select></div><div class="filters opts">${seg('size', 'Size', [20, 24, 32, 48].map(n => [n, n]))}${seg('group', 'Order', [['family', 'Families'], ['az', 'A to Z']])}${MDIOPT}<button class="switch" data-animate role="switch" aria-checked="${S.animate}" title="Play the moving parts of every icon that has them"><i></i>Play motion</button></div>` +
-    (list.length ? body + `<p class="hint"><kbd>←</kbd> <kbd>→</kbd> step through icons · <kbd>P</kbd> pin to compare · shift-click also pins · <kbd>/</kbd> search<br>${ICONS.length} icons, ${ICONS.filter(i => i.d).length} hand-drawn. Corner radius ${RADIUS} px, set when the set is built.</p>` :
+      `<option value="${esc(c)}" ${c === S.cat ? 'selected' : ''}>${esc(c)} (${ICONS.filter(i => catsOf(i).includes(c)).length})</option>`).join('')}</select></div><div class="filters opts">${seg('size', 'Size', [20, 24, 32, 48].map(n => [n, n]))}${seg('group', 'Order', [['family', 'Families'], ['az', 'A to Z']])}${MDIOPT}${LOOK}<button class="switch" data-animate role="switch" aria-checked="${S.animate}" title="Play the moving parts of every icon that has them"><i></i>Play motion</button></div></div>` +
+    (list.length ? body + `<p class="hint"><kbd>←</kbd> <kbd>→</kbd> step through icons · <kbd>P</kbd> add to compare · shift-click also adds · <kbd>/</kbd> search<br>${ICONS.length} icons, ${ICONS.filter(i => i.d).length} hand-drawn. Corner radius ${RADIUS} px, set when the set is built.</p>` :
       `<div class="empty"><strong>No icons match.</strong>Nothing in “${esc(pretty(S.filter))}” matches${S.q ? ` “${esc(S.q)}”` : ''}${S.uses ? ` and uses ${S.uses}` : ''}${S.rule ? ` and follows “${RULE[S.rule]}”` : ''}${S.cat ? ` in ${esc(S.cat)}` : ''}${S.ha ? ` for the ${S.ha} domain` : ''}. Clear the search or pick another filter.</div>`)
 }
 
 function renderCompare() {
   if (!S.pins.length) {
-    $('main').innerHTML = `<div class="empty"><strong>Nothing pinned yet.</strong>Pin icons to line them up here and judge weight, size and style against each other. In Browse, select an icon and press <kbd>P</kbd>, or use the pin button next to its name.</div>`
+    $('main').innerHTML = `<div class="empty"><strong>Nothing to compare yet.</strong>Add icons to line them up here and judge weight, size and style against each other. In Browse, select an icon and press <kbd>P</kbd>, or use Add to compare next to its name.</div>`
     return
   }
   const dark = S.stage === 'dark' ? ' dark' : ''
@@ -425,10 +561,12 @@ function renderInspector() {
       <div class="tools">
         <button class="tool" data-step="-1" aria-label="Previous icon">${chev('M15 6L9 12L15 18')}</button>
         <button class="tool" data-step="1" aria-label="Next icon">${chev('M9 6L15 12L9 18')}</button>
-        <button class="tool" data-pin aria-pressed="${pinned}">${pinned ? 'Pinned' : 'Pin'}</button>
+        <button class="tool" data-pin aria-pressed="${pinned}">${pinned ? 'In compare' : 'Add to compare'}</button>
       </div>
     </div>
-    <div class="seg nav tabs" data-key="tab" role="tablist"><button data-v="preview">Preview</button><button data-v="details">Details</button><button data-v="issues">Issues<b>${probs.length || ''}</b></button></div>
+    <div class="review">${reviewRow(i.n)}</div>
+    <div class="seg nav tabs" data-key="tab" role="tablist"><button data-v="preview">Preview</button><button data-v="details">Details</button><button data-v="issues">Issues<b>${probs.length || ''}</b></button><button data-v="review">Review<b>${REVIEW[i.n]?.comments || ''}</b></button></div>
+    ${reviewTab(i.n)}
     <div data-t="preview" class="stage big${dark}">${S.rules ? RULES : ''}${S.ghost && v !== 'mdi' ? use(i.n, 'mdi', 24, 'ghost') : ''}${(S.animate ? moving : use)(i.n, v, 24)}</div>
     <div data-t="preview" class="stage-opts">
       <div class="seg" data-key="stage" role="group" aria-label="Preview background"><button data-v="light">Light</button><button data-v="dark">Dark</button></div>
@@ -454,6 +592,7 @@ function renderInspector() {
       `<dt>${HAKEYS[k]}</dt><dd>${esc(i.h[k].join(', '))}</dd>`).join('')}
       ${i.h.integrations ? `<dt>Integrations</dt><dd class="num">${i.h.integrations}</dd>` : ''}
       <dt>Frontend</dt><dd>${i.h.ui ? 'Used directly in the interface' : 'Not used directly'}</dd>
+      ${i.h.code ? `<dt>Core code</dt><dd>Set directly in core Python</dd>` : ''}
     </dl>` : '<p class="ok">Home Assistant does not use this icon by default.</p>'}</section>
     <section data-t="details"><h3>Pictogrammers</h3>${i.g ? `<dl>
       <dt>Categories</dt><dd class="rel">${catsOf(i).map(c => `<button class="relchip" data-cat="${esc(c)}" title="Show every icon in this category">${esc(c)}</button>`).join('')}</dd>
@@ -472,6 +611,35 @@ function renderInspector() {
       : '<p class="ok">None in either variant.</p>'}</section>
     ${notes.length ? `<section data-t="issues"><h3>Notes</h3><ul class="notes">${notes.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : ''}`
   $('ins').dataset.tab = S.tab
+  const x = REVIEW[i.n]
+  if (S.tab === 'review' && x && x.comments && !COMMENTS[x.number]) loadComments(x)  // only when the tab is open: arrow keys re-render often
+}
+const signedIn = () => AUTH.client && token
+// status and the one action that matters next, under the icon's name
+function reviewRow(n) {
+  const x = REVIEW[n], st = stOf(n)
+  const badge = `<span class="st" style="--st:${STATUS[st][1]}">${STATUS[st][0]}${x && !x.open ? ' · closed' : ''}</span>`
+  if (reviewError && !signedIn()) return `Review status unavailable: ${esc(reviewError)}`
+  if (signedIn()) return `<select id="setst" aria-label="Review status">${Object.entries(STATUS).filter(([k]) => k || !x).map(([k, [t]]) =>
+      `<option value="${k}" ${k === st ? 'selected' : ''}>${t}</option>`).join('')}</select>
+    <button class="tool" data-v="review" data-gotab>${x?.comments ? `${x.comments} comment${x.comments === 1 ? '' : 's'}` : 'Comment'}</button>${reviewNote ? `<p class="err">${esc(reviewNote)}</p>` : ''}`
+  if (AUTH.client) return `${badge}<button class="tool primary" data-signin>Sign in with GitHub to review</button>${authError ? `<p class="err">${esc(authError)}</p>` : ''}`
+  return x ? `${badge}<a class="tool" href="${x.url}" target="_blank" rel="noopener">${x.comments ? `${x.comments} comment${x.comments === 1 ? '' : 's'}` : 'Discuss'} on GitHub</a>`
+    : `${badge}<a class="tool primary" href="${newIssue(n)}" target="_blank" rel="noopener">Start a review on GitHub</a>`
+}
+function reviewTab(n) {
+  const x = REVIEW[n], list = x && COMMENTS[x.number]
+  const thread = !x || !x.comments && !Array.isArray(list) ? '<p class="ok">No comments yet.</p>'
+    : list === 'loading' || !list ? '<p class="ok">Loading comments…</p>'
+    : list instanceof Error ? `<p class="err">Could not load comments: ${esc(list.message)}</p>`
+    : list.map(c => `<article class="comment"><header><img src="${esc(c.user.avatar_url)}&s=40" alt=""><b>${esc(c.user.login)}</b>
+        <time datetime="${c.created_at}">${new Date(c.created_at).toLocaleString(undefined, {dateStyle: 'medium', timeStyle: 'short'})}</time></header>
+        <div class="body">${c.body_html}</div></article>`).join('')  // body_html is sanitised by GitHub
+  const composer = signedIn() ? `<div class="composer"><textarea id="draft" placeholder="Leave a comment on ${n}" aria-label="Comment">${esc(DRAFT[n] || '')}</textarea>
+      <div><span>${ME ? `Signed in as ${esc(ME.login)} · <button class="link" data-signout>Sign out</button>` : ''}</span><button class="tool primary" data-post>Comment</button></div></div>`
+    : AUTH.client ? `<div class="composer"><div><span>Sign in to comment and change the status.</span><button class="tool primary" data-signin>Sign in with GitHub</button></div></div>`
+    : `<div class="composer"><div><span>Comments are written on GitHub.</span><a class="tool" href="${x ? x.url : newIssue(n)}" target="_blank" rel="noopener">${x ? 'Comment' : 'Start a review'} on GitHub</a></div></div>`
+  return `<section data-t="review"><div class="thread">${thread}</div>${composer}${x ? `<p class="ok" style="margin-top:12px"><a class="link" href="${x.url}" target="_blank" rel="noopener">Open the issue on GitHub</a></p>` : ''}</section>`
 }
 
 // [icon, name, state, tone, level%] - tone decides the colour; no tone means idle
@@ -506,7 +674,7 @@ function dashboard(v, label) {
   </div></div>`
 }
 function renderDash() {
-  $('main').innerHTML = `<div class="filters opts">${MDIOPT}</div><div class="dashes">${dashboard(S.variant, LABEL[S.variant] + ' set')}${S.show === 'mdi' ? dashboard('mdi', 'Material Design Icons') : ''}</div>`
+  $('main').innerHTML = `<div class="dashes">${dashboard(S.variant, LABEL[S.variant] + ' set')}${S.show === 'mdi' ? dashboard('mdi', 'Material Design Icons') : ''}</div>`
 }
 
 function renderMotion() {
@@ -542,12 +710,12 @@ function renderIssues() {
   const total = problemIcons().length
   const waivedIcons = ICONS.filter(i => i.t.some(isWaived))
   const waivedHtml = !waivedIcons.length ? '' : `<section><h2><span class="sev">Waived</span>Rules knowingly not applied<small class="num">${waivedIcons.length}</small></h2>
-    <p>Listed in <code>waivers.json</code>. These do not fail the build.</p><ul class="notes">${waivedIcons.map(i =>
-      `<li><button class="relchip" data-n="${i.n}" aria-current="${i.n === S.sel}">${use(i.n, S.variant, 20)}<span>${i.n}</span></button> ${esc(i.t.filter(isWaived).map(t => t.replace(/^waived \w+: /, '')).filter((t, k, a) => a.indexOf(t) === k).join(' '))}</li>`).join('')}</ul></section>`
+    <p>Listed in <code>waivers.json</code>. These do not fail the build. Hover an icon for the reason.</p><div class="fam">${waivedIcons.map(i =>
+      iconCell(i, 24, S.variant, i.t.filter(isWaived).map(t => t.replace(/^waived \w+: /, '')).filter((t, k, a) => a.indexOf(t) === k).join(' '))).join('')}</div></section>`
   $('main').innerHTML = !total && !waivedHtml ? `<div class="empty"><strong>Nothing to fix.</strong>Every icon passes lint in both variants and no badge cut is flagged.</div>` :
     `<div class="doc issues"><p>${total || 'No'} icon${total === 1 ? '' : 's'} need attention. Errors fail the build; warnings are icons the build could not derive cleanly.</p>${
       KINDS.map(([, sev, title, why], k) => !groups[k].size ? '' : `<section><h2><span class="sev ${sev}">${sev === 'err' ? 'Error' : 'Warning'}</span>${title}<small class="num">${groups[k].size}</small></h2><p>${why}</p>
-        <div class="rel">${[...groups[k]].map(([n, vs]) => `<button class="relchip" data-n="${n}" aria-current="${n === S.sel}">${use(n, vs.has(S.variant) ? S.variant : [...vs][0], 20)}<span>${n}</span><small>${[...vs].join(' + ')}</small></button>`).join('')}</div></section>`).join('')}${waivedHtml}</div>`
+        <div class="fam">${[...groups[k]].map(([n, vs]) => iconCell(byName[n], 24, vs.has(S.variant) ? S.variant : [...vs][0], [...vs].join(' + '))).join('')}</div></section>`).join('')}${waivedHtml}</div>`
 }
 
 function renderRules() {
@@ -566,7 +734,11 @@ function render(what = 'all') {
   document.documentElement.dataset.theme = S.theme
   $('pincount').textContent = S.pins.length || ''
   $('issuecount').textContent = problemIcons().length || ''
-  if (what !== 'ins') ({compare: renderCompare, rules: renderRules, dash: renderDash, motion: renderMotion, issues: renderIssues}[S.mode] || renderBrowse)()
+  if (what !== 'ins') {
+    ;({compare: renderCompare, rules: renderRules, dash: renderDash, motion: renderMotion, issues: renderIssues}[S.mode] || renderBrowse)()
+    // Browse builds its own options row; the other views get one with just the shared options
+    if (S.mode !== 'browse') $('main').insertAdjacentHTML('afterbegin', `<div class="fbar"><div class="filters opts">${S.mode === 'dash' ? MDIOPT : ''}${LOOK}</div></div>`)
+  }
   renderInspector()
   sync()
   try { localStorage.setItem('ha-icons-sheet', JSON.stringify(S)) } catch {}
@@ -574,7 +746,7 @@ function render(what = 'all') {
 
 function select(n, scroll) {
   S.sel = n
-  document.querySelectorAll('.cell,.dtile,.motions button,.issues .relchip').forEach(c => c.setAttribute('aria-current', c.dataset.n === n))
+  document.querySelectorAll('.cell,.dtile,.motions button').forEach(c => c.setAttribute('aria-current', c.dataset.n === n))
   if (scroll) document.querySelector(`.cell[data-n="${n}"]`)?.scrollIntoView({block: 'nearest'})
   render('ins')
 }
@@ -598,6 +770,10 @@ document.addEventListener('click', e => {
     if (seg.dataset.key === 'variant') S.stageV = t.dataset.v
     return render(seg.dataset.key === 'tab' ? 'ins' : 'all')
   }
+  if ('gotab' in t.dataset) { S.tab = 'review'; return render('ins') }
+  if ('signin' in t.dataset) return signIn()
+  if ('signout' in t.dataset) return signOut()
+  if ('post' in t.dataset) return postComment(S.sel)
   if (t.dataset.filter) { S.filter = t.dataset.filter; return render() }
   if (t.dataset.uses) { Object.assign(S, {uses: t.dataset.uses, mode: 'browse', filter: 'all', q: ''}); $('q').value = ''; return render() }
   if ('clearuses' in t.dataset) { S.uses = ''; return render() }
@@ -616,16 +792,24 @@ document.addEventListener('change', e => {
   if (e.target.dataset.toggle) { S[e.target.dataset.toggle] = e.target.checked; render('ins') }
   if (e.target.id === 'cat') { S.cat = e.target.value; render() }
   if (e.target.id === 'ha') { S.ha = e.target.value; render() }
+  if (e.target.id === 'st') { S.st = e.target.value; render() }
+  if (e.target.id === 'setst') setStatus(S.sel, e.target.value)
 })
 $('q').value = S.q
 $('q').addEventListener('input', e => { S.q = e.target.value; render() })
+document.addEventListener('input', e => { if (e.target.id === 'draft') DRAFT[S.sel] = e.target.value })
 document.addEventListener('keydown', e => {
-  if (e.target.matches('input[type=search]')) { if (e.key === 'Escape') e.target.blur(); return }
+  if (e.target.id === 'draft' && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) return postComment(S.sel)
+  if (e.target.matches('input[type=search],textarea,select')) { if (e.key === 'Escape') e.target.blur(); return }
   if (e.metaKey || e.ctrlKey || e.altKey) return
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); step(e.key === 'ArrowRight' ? 1 : -1) }
   else if (e.key.toLowerCase() === 'p') togglePin(S.sel)
   else if (e.key === '/') { e.preventDefault(); $('q').focus() }
 })
 render()
+loadReviews()
+loadMe()
+// pick up status changes made on GitHub when the tab comes back into view
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadReviews() })
 </script>
 </html>
